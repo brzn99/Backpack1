@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html class="no-js multiview">
+<head>
+		
+		<title>multiview demos</title>
+		
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		
+				
+		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />	
+        <link rel="stylesheet" type="text/css" href="../scripts/jqMobile/jquery.mobile.scrollview.css" />
+		<link rel="stylesheet" type="text/css" href="../scripts/jqMobile/jquery.mobile.multiview.css" />
+		
+		<link rel="stylesheet"	href="../scripts/backpack.css" />
+		
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+		
+		
+
+			
+		<script type="text/javascript" src="../scripts/jqMobile/jquery.mobile-1.0multiview.js"></script>		
+		<script type="text/javascript" src="../scripts/jqMobile/jquery.easing.1.3.js"></script>
+        <script type="text/javascript" src="../scripts/jqMobile/jquery.mobile.scrollview.js"></script>
+		<script type="text/javascript" src="../scripts/jqMobile/jquery.mobile.multiview.js"></script>
+		<!-- <script type="text/javascript" src="../scripts/jqMobile/jquery.mobile.min.js"></script> -->
+		
+		<script type="text/javascript" src="../scripts/db.js"></script>
+		
+		<script type="text/javascript" src="../scripts/ckeditor.js"></script>
+		<script type="text/javascript" src="../scripts/adapters/jquery.js"></script>
+		
+		<script type="text/javascript" src="../scripts/mobiscroll/js/jquery.mobile.mobiscroll-1.0.js"></script>
+	<script type="text/javascript" src="../scripts/mobiscroll/js/mobiscroll.core-2.1.js"></script>
+	<script type="text/javascript" src="../scripts/mobiscroll/js/mobiscroll.datetime-2.1.js"></script>
+	<script type="text/javascript" src="../scripts/mobiscroll/js/mobiscroll.jqm-2.1.js"></script>
+	<script type="text/javascript" src="../scripts/mobiscroll/js/mobiscroll.select-2.1.js"></script>
+	<script type="text/javascript" src="../scripts/mobiscroll/js/mobiscroll.android-2.1.js"></script>
+	<script type="text/javascript" src="../scripts/mobiscroll/js/mobiscroll.ios-2.1.js"></script>
+	
+	<link rel="stylesheet"	href="../scripts/mobiscroll/css/mobiscroll.core-2.1.css" />
+	<link rel="stylesheet"	href="../scripts/mobiscroll/css/mobiscroll.jqm-2.1.css" />
+	<link rel="stylesheet"	href="../scripts/mobiscroll/css/mobiscroll.animation-2.1.css" />
+	<link rel="stylesheet"	href="../scripts/mobiscroll/css/mobiscroll.android-2.1.css" />
+	<link rel="stylesheet"	href="../scripts/mobiscroll/css/mobiscroll.ios-2.1.css" />
+	
+		<style type="text/css">
+			.middleClass {text-align: center; margin-top: 25%;}
+			code { padding: 0 0.5em;}
+			.blank, .blank li {font-size: 95%;}
+			.ui-page { background: #ffffff;}
+			ui-grid-d {text-align: center;}
+			fieldset img, img {display: block; margin: 0 auto; }
+			* {font-size: 13px;}
+		</style>
+		
+		
+<script>
+
+	var dbClass;
+	var dbSemester;
+	var dbNote;
+	var dbQAMaster;
+	var notesVisible=false;
+	var qaVisible=false;
+	var dbQADetail;
+
+	$(document).ready(function() {
+		
+//		$('#classInfoPageHref').hide();
+		
+		$("#go").click(function() {
+			//$("#classListDiv").html('');
+			var htm;
+			htm=htm+'<ul id="classList" data-role="listview" data-inset="true" data-theme="d" data-divider-theme="a">';
+			htm=htm+'<li data-role="list-divider">Classes:</li>	';
+			htm=htm+'<li><a href="#demos"  data-target="menu" data-context="#demosHeadliner" data-context-panel="main">1 2 3 4 5 6 7 8 9 0</a></li>';	
+			htm=htm+'<li><a href="#demos"  data-target="menu" data-context="#demosHeadliner" data-context-panel="main">1 2 3 4 5 6 7 8 9 0</a></li>';	
+			htm=htm+'<li><a href="#demos"  data-target="menu" data-context="#demosHeadliner" data-context-panel="main">1 2 3 4 5 6 7 8 9 0</a></li>';	
+			htm=htm+'<li><a href="#demos"  data-target="menu" data-context="#demosHeadliner" data-context-panel="main">1 2 3 4 5 6 7 8 9 0</a></li>';	
+			htm=htm+'<li><a href="#demos"  data-target="menu" data-context="#demosHeadliner" data-context-panel="main">1 2 3 4 5 6 7 8 9 0</a></li>';	
+			htm=htm+'</ul>';
+			$("#classListDiv").html(htm);
+			//$('#classList').attr("data-role", "listview");
+			//$('#classList').attr("data-inset", "true");
+			//$('#classList').attr("data-theme", "d");
+			//$('#classList').attr("data-divider", "a");
+		
+			$("#classListDiv").trigger("pagecreate");
+			//$("#contentDiv").trigger("pagecreate");
+			//$('#classList').listview('refresh');
+			
+		});
+		$(function(){
+			// create a datepicker with default settings
+			$("#classTime").scroller({ preset: 'time' });
+		});
+		
+		$("#reload").click(function() {
+			reload();
+		});
+		
+		
+		$("#load").click(function() {
+			//semesterSelect(1);
+			reload();
+		});
+		
+		$("#editClass").click(function() {
+			gotoEditClass();
+		});
+		
+		$("#cancelUpdateClass").click(function() {
+			//alert("cancelUpdateClass="+dbClass);
+			if(dbClass)
+			{
+				//alert("cancelUpdateClass2="+dbClass.rows.item(0).id);
+				goo(dbClass.rows.item(0).id);
+			}
+			else
+			{
+				goo(1);
+			}
+		});
+		
+		$("#updateClass").click(function() {
+			validateClass();
+		});
+		
+		reload();
+		
+		
+		$("#cancelNoteBtn").click(function() {
+			//alert("cancelUpdateClass="+dbClass);
+			if(dbClass)
+			{
+				//alert("cancelUpdateClass2="+dbClass.rows.item(0).id);
+				goo(dbClass.rows.item(0).id);
+			}
+			else
+			{
+				goo(1);
+			}
+		});
+		
+		//$('#theNote').jqte();
+		
+		$("#saveNoteBtn").click(function() {
+			
+			n=$("textarea#theNote").val();
+			//alert(dbNote+", note="+n+", dbClass="+dbClass);
+			if(dbNote)
+			{
+				updateDBNotes( dbNote.id, n);
+			}
+			else
+			{
+				createDBNotes( dbClass.rows.item(0).id, n);
+			}	
+			if(dbClass)
+			{
+				goo(dbClass.rows.item(0).id);
+			}
+			else
+			{
+				goo(1);
+			}
+			
+		});
+		
+		$("#notesToggle").click(function() {
+					if (notesVisible)
+					{
+						$("#notesListDiv").hide();
+						notesVisible=false;
+						qaVisible=false;
+						$("#qaMasterListDiv").hide();
+					}
+					else
+					{
+						$("#notesListDiv").show();
+						notesVisible=true;
+						qaVisible=false;
+						$("#qaMasterListDiv").hide();
+					}
+		});
+		
+		$("#qaToggle").click(function() {
+					if (qaVisible)
+					{
+						$("#qaMasterListDiv").hide();
+						qaVisible=false;
+						notesVisible=false;
+						$("#notesListDiv").hide();
+					}
+					else
+					{
+						$("#qaMasterListDiv").show();
+						qaVisible=true;
+						notesVisible=false;
+						$("#notesListDiv").hide();
+					}
+		});
+				
+				
+		
+		$("#addSemester").click(function() {
+			newSemester();			
+		});
+		
+		$("#updateSemester").click(function() {
+			//alert("updatesemester clicked");
+			validateSemester();			
+		}); 
+		
+		$(document).delegate('#addQAMasterBtn', 'click', function() {
+		  	$.mobile.changePage($('#editQAMasterPage'));
+		});
+		$("#cancelQAMaster").click(function() {
+			goo(dbClass.rows.item(0).id);			
+		});
+
+		$("#updateQAMaster").click(function() {
+			addQAMaster();			
+		});
+		
+		$("#cancelQAMasterPage").click(function() {
+			goo(dbClass.rows.item(0).id);				
+		});
+		
+		$("#cancelQA").click(function() {
+			alert("cancelqa="+dbQAMaster.rows.item(0).id);
+			qaMasterSelect(dbQAMaster.rows.item(0).id);
+			//goo(dbClass.rows.item(0).id);		 
+							 
+		});
+		
+		$("#cancelQAButton").click(function() {
+			alert("cancelqa="+dbQAMaster.rows.item(0).id);
+			qaMasterSelect(dbQAMaster.rows.item(0).id);
+			
+			//goo(dbClass.rows.item(0).id);		 
+							 
+		});
+		
+		
+		
+		
+		$("#updateQA").click(function() {
+			if(dbQADetail)
+			{
+				//alert("udpate qadetail="+ dbQADetail.rows.item(0).qaId);
+				updateDBQaDetail( dbQADetail.rows.item(0).qaId, $("#question").val(), $("#answer").val());
+				//qaDetailSelect(dbQADetail.rows.item(0).qaId);	
+				qaMasterSelect(dbQAMaster.rows.item(0).id);		
+			}
+			else
+			{
+				alert("create qadetail");
+				id=dbQAMaster.rows.item(0).id;
+				createQADetail( id, $("#question").val(), $("#answer").val());
+				qaMasterSelect(dbQAMaster.rows.item(0).id);		
+			}	
+			//alert("master id="+dbQAMaster.rows.item(0).id);
+					
+		});
+		
+		
+		var db = initDB();
+		createTBackpackTables(db);
+		createClassesTable(db);
+		createNotesTable(db);
+		createQAMasterTable(db);
+		createQADetailTable(db);
+		
+		alert(dbSemester);
+		
+		
+		
+	});	
+	
+	function reload()
+	{
+	
+		getAllSemesters(function(transaction, semesters){
+				populateSemesters(semesters);
+				semesterSelect(semesters.rows.item(0).id);
+		});
+	}
+
+	function semesterSelect(id)
+	{
+		//alert("semesterSelect="+id);
+		getSemesterById(id, getSemesterCallback);
+	}
+	
+	function getSemesterCallback(transaction, results)
+	{
+		
+		//alert("getSemesterCallback");
+		var len = results.rows.length, i;
+		if(len == 1) {
+			selectedSemester=results.rows.item(0);
+			dbSemester=results;
+			getAllClassesForSemester(selectedSemester, populateClasses) ;
+		}
+		
+	}
+	
+	function goo(classId)
+	{
+		//alert("goo()="+classId);
+		$("#notesListDiv").hide();
+		$("#qaMasterListDiv").hide();
+		notesVisible=false;
+		getDBClass(classId, function(transaction, theClass){
+				dbClass=theClass;
+				classHtml=getClassHeaderHtml(theClass);
+				//alert("classelect="+dbClass);
+				$("#classInfoPageHeader").html(classHtml);
+				$('#classInfoPageHref').trigger('click');
+				getClassNotes(classId);
+				getQAMasterList(classId);
+		});
+		
+		
+	
+	}
+	
+	
+	
+	function gotoClassInfo()
+	{
+	
+		//alert("classinfo");
+		$.mobile.changePage($('#setup'));
+	}
+	
+	function getClassHeaderHtml(theClass)
+	{
+	
+		html=theClass.rows.item(0).className +"-"+ theClass.rows.item(0).classNumber+"</p>";
+		
+		return html;
+	}
+
+	function populateSemesters(results) {
+
+
+		var len = results.rows.length, i;
+		var htm='';
+		
+		//alert("populateSemesters="+len);		
+		
+		htm=htm+'<ul id="semesterList" data-role="listview" data-inset="true" data-theme="d" data-divider-theme="a">';
+		htm=htm+'<li data-role="list-divider">Semesters:</li>';
+		for (i = 0; i < len; i++) {
+			var sid =  results.rows.item(i).id;
+			var semesterClick='href="#" onclick="javascript:semesterSelect(\''+sid+'\')"';
+			htm=htm+'<li><a '+semesterClick+' data-target="main" >'+results.rows.item(i).sname+'</a></li>';
+		}
+		htm=htm+'</ul>';
+		//alert(htm);
+		$("#semesterListDiv").html(htm);
+				
+		$("#semesterListDiv").trigger("pagecreate");
+		
+		
+		//$.mobile.changePage($('#wrap1'));
+		//getSemesterById(selectedSemester.id, updateClassListWithSemeter);
+	}
+	
+	function populateClasses(transaction, results) {
+
+
+		var len = results.rows.length, i;
+		var htm='';
+		
+		//alert("populateClasses="+len);		
+		//<li><a href="#xxx" data-target="main">Settings</a></li>
+		
+		htm=htm+'<ul id="classList" data-role="listview" data-inset="true" data-theme="d" data-divider-theme="a">';
+		if(dbSemester)
+		{
+			htm=htm+'<li data-role="list-divider">Classes for '+dbSemester.rows.item(0).sname+'</li>';
+		}
+		else
+		{
+			htm=htm+'<li data-role="list-divider">Classes for:</li>';
+		}
+		for (i = 0; i < len; i++) {
+			var sid =  results.rows.item(i).id;
+			var classClick='href="#" onclick="javascript:goo(\''+sid+'\')"';
+			htm=htm+'<li><a '+classClick+' data-target="main" >'+results.rows.item(i).className+'</a></li>';
+		}
+		htm=htm+'</ul>';
+		//alert(htm);
+		$("#classListDiv").html(htm);
+				
+		$("#classListDiv").trigger("pagecreate");
+		
+		$('#addSemesterPageHref').trigger('click');
+		
+				
+		//$.mobile.changePage($('#wrap1'));
+		//getSemesterById(selectedSemester.id, updateClassListWithSemeter);
+	}
+	
+	function gotoEditClass()
+	{
+	
+		//alert("gotoEditClass()="+dbClass.rows.item(0).id);
+		getDBClass(dbClass.rows.item(0).id, function(transaction, results){
+				classHtml=getClassHeaderHtml(results);
+				var len = results.rows.length, i;
+				selectedClass=results.rows.item(0);
+				$("#classEntryClassId").val(results.rows.item(0).id);
+				$("#building").val(results.rows.item(0).building);
+				$("#className").val(results.rows.item(0).className);
+				$("#classNumber").val(results.rows.item(0).classNumber);
+		
+				$('input:radio[name=credits]')[0].checked = true;
+				$('input:radio[name=credits]')[1].checked = false;
+				$('input:radio[name=credits]')[2].checked = false;
+				$('input:radio[name=credits]')[3].checked = true;
+		
+				var c=results.rows.item(0).credits - 1;
+		
+				$('input:radio[name=credits]')[c].checked = true;
+		
+				$("#room").val(results.rows.item(0).room);
+				$("#teacher").val(results.rows.item(0).teacher);
+				$("#teacherEmail").val(results.rows.item(0).teacherEmail);
+				$("#teacherPhone").val(results.rows.item(0).teacherPhone);
+		
+		
+				$("#classTime").val(results.rows.item(0).timeOfClass);
+		
+				$('#day-sundayCB').attr('checked', false);
+				$('#day-mondayCB').attr('checked', false);
+				$('#day-tuesdayCB').attr('checked', false);
+				$('#day-wednesdayCB').attr('checked', false);
+				$('#day-thursdayCB').attr('checked', false);
+				$('#day-fridayCB').attr('checked', false);
+				$('#day-satdayCB').attr('checked', false);
+		
+				var daysArray = new Array();
+				daysArray = results.rows.item(0).days.split(",");
+	
+		for (day in daysArray ) 
+		{
+			if(daysArray[day] == "Sunday")
+			{
+				$('#day-sundayCB').attr('checked', true);
+			}
+			if(daysArray[day] == "Monday")
+			{
+				$('#day-mondayCB').attr('checked', true);
+			}
+			if(daysArray[day] == "Tuesday")
+			{
+				$('#day-tuesdayCB').attr('checked', true);
+			}
+			if(daysArray[day] == "Wednesday")
+			{
+				$('#day-wednesdayCB').attr('checked', true);
+			}
+			if(daysArray[day] == "Thursday")
+			{
+				$('#day-thursdayCB').attr('checked', true);
+			}
+			if(daysArray[day] == "Friday")
+			{
+				$('#day-fridayCB').attr('checked', true);
+			}
+			if(daysArray[day] == "Saturday")
+			{
+				$('#day-satdayCB').attr('checked', true);
+			}
+		}
+	
+		$('#credits1').checkboxradio('refresh');		
+		$('#credits2').checkboxradio('refresh');
+		$('#credits3').checkboxradio('refresh');		
+		$('#credits4').checkboxradio('refresh');	
+		
+		$('#day-sundayCB').checkboxradio('refresh');
+		$('#day-mondayCB').checkboxradio('refresh');
+		$('#day-tuesdayCB').checkboxradio('refresh');
+		$('#day-wednesdayCB').checkboxradio('refresh');
+		$('#day-thursdayCB').checkboxradio('refresh');
+		$('#day-fridayCB').checkboxradio('refresh');
+		$('#day-saturdayCB').checkboxradio('refresh');	
+		
+		$.mobile.changePage($('#editClassPage'));
+		
+	
+		
+		});
+	
+	}
+	
+	function validateClass()
+	{
+		//alert("validateClass1");
+		var daylist = "";
+		var dayArray = [];
+		idx=0;
+		if($('#day-sundayCB').attr('checked')) 
+		{
+    		dayArray[idx]="Sunday";
+    		idx++;
+		} 
+		if($('#day-mondayCB').attr('checked')) 
+		{
+    		dayArray[idx]="Monday";
+    		idx++;
+		} 
+		if($('#day-tuesdayCB').attr('checked')) 
+		{
+    		dayArray[idx]="Tuesday";
+    		idx++;
+		} 
+		if($('#day-wednesdayCB').attr('checked')) 
+		{
+    		dayArray[idx]="Wednesday";
+    		idx++;
+		} 
+		if($('#day-thursdayCB').attr('checked')) 
+		{
+    		dayArray[idx]="Thursday";
+    		idx++;
+		} 
+		if($('#day-fridayCB').attr('checked')) 
+		{
+    		dayArray[idx]="Friday";
+    		idx++;
+		} 
+		if($('#day-saturdayCB').attr('checked')) 
+		{
+    		dayArray[idx]="Saturday";
+    		idx++;
+		} 
+		if (!$("#className").val().length) {
+			alert("Class Name required.");
+			$("#className").focus();
+			return;
+		}
+		
+		//alert("semester="+dbSemester);
+		var myClass = new ClassObject();
+		myClass.building=$("#building").val();
+		myClass.classNm=$("#className").val();
+		myClass.classNumber=$("#classNumber").val();
+		myClass.credits=$('input[name=credits]:checked').val();
+		myClass.days=dayArray;
+		myClass.room=$("#room").val();
+		myClass.semesterId=dbSemester.rows.item(0).id;
+		myClass.teacher=$("#teacher").val();
+		myClass.teacherEmail=$("#teacherEmail").val();
+		myClass.teacherPhone=$("#teacherPhone").val();
+		myClass.time=$("#classTime").val();
+		
+		//alert("validateClass1 AAA");
+		
+		myClass.id=$("#classEntryClassId").val();
+		
+		//alert("validateClass3="+$("#classEntryClassId").val());
+		if($("#classEntryClassId").val() == "-1")
+		{
+			createDBClass(myClass);
+			
+			getDBClassByName(myClass.classNm, function(transaction, theClass){
+				dbClass=theClass;
+				classHtml=getClassHeaderHtml(theClass);
+				//alert("Class credted="+theClass.rows.item(0).id);
+				$("#classInfoPageHeader").html(classHtml);
+				semesterSelect(1);
+				goo(theClass.rows.item(0).id);
+			});
+		}
+		else
+		{
+			updateDBClass(myClass);
+			goo($("#classEntryClassId").val());
+		}
+		
+		
+	}
+	
+	function addClassPage(semesterId)
+	{
+		//alert("add class");
+		dbClass=null;
+		$("#classEntryClassId").val("-1");
+		$("#building").val("");
+		$("#className").val("");
+		$("#classNumber").val("");
+		$("#credits").val("");
+		$("#room").val("");
+		$("#teacher").val("");
+		$("#teacherEmail").val("");
+		$("#teacherPhone").val("");
+		$("#classTime").val("");
+		$('#addClassPageHref').trigger('click');
+	}
+	
+	function addClassLink()
+	{
+	
+		//alert("addClassLink");
+		addClassPage(1);
+		
+	}
+	
+	function getClassNotes2(id)
+	{
+		var x;
+		//alert("getClassNotes="+id);
+		getDBClass2(id, function(transaction, results){
+ 			x=results.rows.item(0).className;
+			noteClassId=id;
+			$("#notesListClassname").text(results.rows.item(0).className);
+			$("#notesListRoom").text(results.rows.item(0).room);
+			currentDate="";
+			getAllNotesForClass(id, function(transaction2, theClassNotes){
+				var len = theClassNotes.rows.length, i;
+				var htm='';
+		
+				//alert("getClassNotes="+len);		
+				//<li><a href="#xxx" data-target="main">Settings</a></li>
+				
+				htm=htm+'<ul id="notesList" data-role="listview" data-theme="a" data-divider-themex="a">';
+				htm=htm+'<li data-role="list-divider">Notes:<input type="button" name="newNote" id="newNote" data-inline="true" value="New Note"></li>';
+				for (i = 0; i < len; i++) {
+					theDate=theClassNotes.rows.item(i).dateCreated.substring(0, 8);
+					if(currentDate != theDate)
+					{
+						fDate=dateFormatter(theDate);
+						//fDate="xxx";
+						htm=htm+'<li data-role="list-divider" data-divider-theme="e" data-theme="a">'+fDate+'</li>';
+						currentDate=theDate;
+					}
+					var sid =  theClassNotes.rows.item(i).id;
+					var notesClick='href="#" onclick="javascript:notesSelect(\''+sid+'\')"';
+					var showNote=theClassNotes.rows.item(i).notes.substring(0, 25);
+					htm=htm+'<li><a '+notesClick+' data-target="main" >'+showNote+'...</a></li>';
+				}
+				htm=htm+'</ul>';
+				//alert(htm);
+				$("#notesListDiv").html(htm);
+						
+				$("#notesListDiv").trigger("pagecreate");
+				
+				$("#newNote").click(function() {
+					newNote();
+				});
+				
+				
+//				<ul data-role="listview" data-theme="d" data-divider-theme="d">
+				
+				
+			//<li data-role="list-divider">Friday, October 8, 2010 <span class="ui-li-count">2</span></li>
+			//<li><a href="index.html">
+				
+				//	<h3>Stephen Weber</h3>
+//					<p><strong>You've been invited to a meeting at Filament Group in Boston, MA</strong></p>
+//					<p>Hey Stephen, if you're available at 10am tomorrow, we've got a meeting with the jQuery team.</p>
+//					<p class="ui-li-aside"><strong>6:24</strong>PM</p>
+				
+//			</a></li>
+			});
+			
+			
+		});
+		
+		
+	}
+	function getClassNotes(id)
+	{
+		var x;
+		//alert("getClassNotes="+id);
+		getDBClass2(id, function(transaction, results){
+ 			x=results.rows.item(0).className;
+			noteClassId=id;
+			$("#notesListClassname").text(results.rows.item(0).className);
+			$("#notesListRoom").text(results.rows.item(0).room);
+			currentDate="";
+			getAllNotesForClass(id, function(transaction2, theClassNotes){
+				var len = theClassNotes.rows.length, i;
+				var htm='';
+		
+				//alert("getClassNotes="+len);		
+				//<li><a href="#xxx" data-target="main">Settings</a></li>
+				
+				htm=htm+'<ul id="notesList" data-role="listview" data-theme="a" data-divider-themex="a">';
+				htm=htm+'<li data-role="list-divider">Notes:<input type="button" name="newNote" id="newNote" data-inline="true" value="New Note"></li>';
+				htm=htm+'</ul>';
+				for (i = 0; i < len; i++) {
+					theDate=theClassNotes.rows.item(i).dateCreated.substring(0, 8);
+					if(currentDate != theDate)
+					{
+						if(i > 0)
+						{
+							htm=htm+'</div>';
+							//htm=htm+'<div id="row1" class="rows">';
+						}
+						fDate=dateFormatter(theDate);
+						//fDate="xxx";
+						//htm=htm+'<li data-role="list-divider" data-divider-theme="e" data-theme="a">'+fDate+'</li>';
+						htm=htm+'<h3>'+fDate+'</h3>';
+						htm=htm+'<div id="row1" class="rows">';
+						currentDate=theDate;
+					}
+					var sid =  theClassNotes.rows.item(i).id;
+					var notesClick='href="#" onclick="javascript:notesSelect(\''+sid+'\')"';
+					notesClick=' onclick="javascript:notesSelect(\''+sid+'\')" ';
+					var showNote=theClassNotes.rows.item(i).notes.substring(0, 25);
+					//htm=htm+'<li><a '+notesClick+' data-target="main" >'+showNote+'...</a></li>';
+					htm=htm+'<div class="cols col1">';
+ 					htm=htm+'<div class="noteDiv"'+notesClick+'>'+showNote+'</div>';
+ 					htm=htm+'</div>';
+				}
+				htm=htm+'</div>';
+				//alert(htm);
+				$("#notesListDiv").html(htm);
+						
+				$("#notesListDiv").trigger("pagecreate");
+				
+				$("#newNote").click(function() {
+					newNote();
+				});
+				
+				
+			});
+			
+			
+		});
+		
+		
+	}
+	
+	function notesSelect(noteId)
+	{
+		//$("#theNote").ckeditor();
+		//$("#theNote").css("visibility","visible"); 
+		$("#notesDialogClassname").text(dbClass.className);
+		$("#notesDialogRoom").text(dbClass.room);
+		getDBNote(noteId, function(transaction, classNote){
+				var len = classNote.rows.length, i;
+				dbNote=classNote.rows.item(0);
+				//alert(dbNote.notes);
+				$("#theNote").html('');
+ 				$("#theNote").html(dbNote.notes);
+ 				$("#theNote").val(dbNote.notes);
+ 				//$("#theNote").ckeditor();
+ 				
+				$.mobile.changePage($('#notesEntryPage'));
+			});
+	
+	}
+	
+	function newNote()
+	{
+		dbNote=null;
+ 		$("#theNote").val("");
+		$.mobile.changePage($('#notesEntryPage'));
+	}
+	
+	function newSemester()
+	{
+		dbSemester=null;
+ 		$("#theNote").val("");
+		$('#addSemesterPageHref').trigger('click');
+	}
+	
+	function validateSemester() {
+	
+		//alert("validate semester="+ $("#semesterName").val());
+		if (!$("#semesterName").val().length) {
+			alert("Semester Name required.");
+			//$(".errormsgbox").fadeIn(2000); 
+			$('#semesterName').focus();
+			return;
+		}
+
+		//does semester exist?
+		semester = $("#semesterName").val();  
+		//alert( "validateSemester="+$("#semesterName").val());
+		getSemester($("#semesterName").val(), function(transaction, results){
+				//alert( "validateSemester2="+$("#semesterName").val()); 
+				var len = results.rows.length;
+				//alert("getSemester() len=" + len); 
+				for (i = 0; i < len; i++) {
+					alert(results.rows.item(i).sname);
+				}
+				if (dbSemester) {
+					//alert("updatesemester() ");
+					updateSemester(dbSemester.rows.item(0).id, $("#semesterName").val());
+				}
+				else
+				{
+					//alert("createsemester() ");
+					createSemester($("#semesterName").val(), $("#semesterSession").val());
+					
+				}
+				alert("reload");
+				reload();
+		});
+		
+		
+	}
+	
+	function getQAMasterList(classId)
+	{
+		var x;
+		getDBClass2(classId, function(transaction, results){
+ 			x=results.rows.item(0).className;
+ 			dbClass=results;
+			qaClassId=classId;
+			$("#qaMasterListClassname").text(results.rows.item(0).className);
+			$("#qaMasterListRoom").text(results.rows.item(0).room);
+			getAllQAMastersForClass(classId, function(transaction2, theClassQAs){
+				var len = theClassQAs.rows.length, i;
+				noteClassId=classId;
+				var htm='';
+		
+				//alert("getClassNotes="+len);		
+				//<li><a href="#xxx" data-target="main">Settings</a></li>
+				
+				htm=htm+'<ul id="qaMasterList" data-role="listview" data-theme="a" data-divider-themex="a">';
+				htm=htm+'<li data-role="list-divider">Q&A:<input type="button" name="addQAMasterBtn" id="addQAMasterBtn" data-inline="true"  data-rel="dialog" data-transition="pop" value="New Q&A"></li>';
+				
+				//<a href="dialog.html" data-role="button" data-inline="true" data-rel="dialog" data-transition="pop">Open dialog</a>
+				for (i = 0; i < len; i++) {
+					var sid =  theClassQAs.rows.item(i).id;
+					var qaClick='href="#" onclick="javascript:qaMasterSelect(\''+sid+'\')"';
+					htm=htm+'<li><a '+qaClick+' data-target="main" >'+theClassQAs.rows.item(i).name+'...</a></li>';
+				}
+				htm=htm+'</ul>';
+				$("#qaMasterListDiv").html(htm);
+				$("#qaMasterListDiv").trigger("pagecreate");
+			});
+			
+			
+		});
+		
+		
+	}
+	
+	function addQAMaster()
+	{
+		
+		qaMasterName=$('#qaMasterName').val();
+		//alert("addQAMaster="+qaMasterName);
+		getQAMasterByName(dbClass.rows.item(0).id, qaMasterName, function(transaction, qqq){
+				var len = qqq.rows.length, i;
+				if (len == 0)
+				{
+					createQAMaster(dbClass.rows.item(0).id, qaMasterName) ;
+					goo(dbClass.rows.item(0).id);
+				}
+				else
+				{
+					
+					alert("QA already exists. Please choose another.");
+				}	return;
+			});
+		
+	}
+	
+	function qaMasterSelect(id)
+	{
+		//alert("qaMasterSelect="+id);
+		getQAMasterById(id, function(transaction, qaMaster){
+				var len = qaMaster.rows.length, i;
+				dbQAMaster=qaMaster;
+				getQADetailList(qaMaster.rows.item(0).id);
+				$.mobile.changePage($('#qaMasterPage'));
+			});
+	
+	}
+	function getQADetailList(masterId)
+	{
+		var x;
+		getQAMasterById(masterId, function(transaction, results){
+ 			x=results.rows.item(0).name;
+			qaMasterId=masterId;
+			getQADetailByMasterId(masterId, function(transaction2, theDetails){
+				var len = theDetails.rows.length, i;
+				var htm='';
+		
+				//alert("getQADetailList="+len);		
+				//<li><a href="#xxx" data-target="main">Settings</a></li>
+				
+				htm=htm+'<ul id="qaDetailsList" data-role="listview" data-theme="a" data-divider-themex="a">';
+				htm=htm+'<li data-role="list-divider">Q&A:<input type="button" name="addQADetailBtn" id="addQADetailBtn" data-inline="true"  data-rel="dialog" data-transition="pop" value="New Question"></li>';
+				for (i = 0; i < len; i++) {
+					var sid =  theDetails.rows.item(i).id;
+					var qaClick='href="#" onclick="javascript:qaDetailSelect(\''+sid+'\')"';
+					htm=htm+'<li><a '+qaClick+' data-target="main" >'+theDetails.rows.item(i).question+'</a></li>';
+				}
+				htm=htm+'</ul>';
+				$("#qaDetailsListDiv").html(htm);
+						
+				$("#qaDetailsListDiv").trigger("pagecreate");
+				
+				$("#addQADetailBtn").click(function() {
+					newQADetail();
+				});
+			});
+			
+			
+		});
+		
+		
+	}
+	
+	function newQADetail()
+	{
+ 		$("#question").val("");
+ 		$("#answer").val("");
+		$.mobile.changePage($('#qaEntry'));
+	}
+	
+	function qaDetailSelect(id)
+	{
+	
+		//goo(dbClass.rows.item(0).id);
+		//$.mobile.changePage($('#qaEntry'));
+		//return;
+		
+		$("#question").val(''); 
+		$("#answer").val('');
+		getQADetailById(id, function(transactionx, theQa){
+				
+				var len = theQa.rows.length, i;
+				alert("qaDetailSelect len ="+len);
+				dbQADetail=theQa;
+				$("#question").val(dbQADetail.rows.item(0).question);
+				$("#answer").val(dbQADetail.rows.item(0).answer);
+				//$.mobile.changePage($('#qaEntry'));
+				$('#qaEntryPageHref').trigger('click');
+			});
+	
+	}
+
+
+</script>		
+</head>
+<body>
+	
+			
+<div data-role="page" id="wrap1" data-wrapper="true">
+		
+	
+		<a id="classInfoPageHref" href="#classInfoPage" data-target="main"></a>
+		<a id="addClassPageHref" href="#editClassPage" data-target="main"></a>
+		<a id="addSemesterPageHref" href="#editSemesterPage" data-target="main"></a>
+		<a id="qaEntryPageHref" href="#qaEntry" data-target="main"></a>
+		
+		
+		<!-- ////////////// embedded menu panel /////////////  -->
+		<div data-role="panel" data-id="menu" data-hash2="history" data-panel="menu">				  		 	 
+		
+			<div data-role="page" id="starthere" data-show="first">
+				<div data-role="header" data-position="fixed" data-theme="a">			
+					<h1>Backpack</h1>
+				</div>
+				<div id="contentDiv" data-role="content">
+						<p>Welcome!</p>
+						
+						<ul data-role="listview" data-inset="true" data-theme="d" data-divider-theme="a">	
+							<li data-role="list-divider">Setup</li>
+							<li><a href="#setup" data-target="main">Personal Setup</a></li>
+							<li><a href="#xxx" data-target="main">Settings</a></li>
+							
+						</ul>
+						
+						
+						<div id="classListDiv" >
+						<ul id="classList" data-role="listview" data-inset="true" data-theme="d" data-divider-theme="a">
+						</ul>
+						</div>
+						
+						<input type="button" onclick="addClassLink()" name="addClass" id="addClass" value="Add a Class">
+						
+						<div id="semesterListDiv" >
+						<ul id="semesterList" data-role="listview" data-inset="true" data-theme="d" data-divider-theme="a">
+						</ul>
+						</div>
+						
+						<input type="button" onclick2="addSemesterLink()" name="addSemester" id="addSemester" value="Add a Semester">
+						
+						<input type="button" name="load" id="load" value="load">
+						
+				</div>
+			</div>
+			
+			
+			
+			
+			
+			
+			
+							
+			
+			
+			
+		</div><!-- end panel -->
+		
+		<!-- ////////////// embedded main panel ///////////////  -->		
+		<div data-role="panel" data-id="main" data-panel="main" data-hash2="history">		
+			
+			<div data-role="page" id="mainInit" data-show="first">
+				<div data-role="header" data-position="fixed" data-theme="a">			
+					<h1>Main Section</h1>
+				</div>
+				<div data-role="content">
+					<p class="middleClass">Load some content here... </p>																		
+				</div>
+			</div>
+			
+			<!-- class pages -->
+			<div data-role="page" id="classInfoPage">
+				<div data-role="header" data-position="fixed" data-theme="a">			
+					<h1 id="classInfoPageHeader">Setup</h1>
+				</div>
+				<div data-role="content">
+					<div class="ui-body ui-body-e">
+						<a href="#" name="editClass" id="editClass" data-role="button" data-theme="a" data-icon="arrow-l" data-inline="true">Edit Class Info</a>
+						<a href="#" name="notesToggle" id="notesToggle" data-role="button" data-theme="b" data-icon="arrow-l" data-inline="true">Notes</a>
+						<a href="" name="qaToggle" id="qaToggle" data-role="button" data-theme="c" data-icon="arrow-l" data-inline="true">Q&A</a>
+						<a href="index.html" data-role="button" data-theme="d" data-icon="arrow-l" data-inline="true">More to Come...</a>
+					</div>
+					
+					<br>
+					
+					<div id="notesListDiv" >
+						<ul id="notesList" data-role="listview" data-inset="true" data-theme="d" data-divider-theme="a">
+						</ul>
+					</div>
+					
+					
+					<div id="qaMasterListDiv" >
+						<ul id="qaMasterList" data-role="listview" data-inset="true" data-theme="d" data-divider-theme="a">
+						</ul>
+					</div>
+					
+					
+				</div>
+			</div>
+			
+			<!-- notes pages -->
+			<div data-role="page" id="notesEntryPage">
+				<div data-role="header" data-position="fixed" data-theme="a">			
+					<h1 id="classInfoPageHeader2">Setup</h1>
+				</div>
+				<div data-role="content">
+					
+					
+					<input type="hidden" id="notesEntryClassId">
+    				<textarea id="theNote" name="theNote" rows="33" cols="50"></textarea>
+
+    				<a href="#" id="saveNoteBtn" data-role="button" >Save note</a>
+    				<input type="button" name="cancelNoteBtn" id="cancelNoteBtn" value="Cancel">
+					
+					
+				</div>
+			</div>
+			
+			<!-- semester pages -->
+			<div data-role="page" id="editSemesterPage">
+				<div data-role="header" data-position="fixed" data-theme="a">			
+					<h1 id="classInfoPageHeader2">Setup</h1>
+				</div>
+				<div data-role="content">
+					
+					
+					<h2 id="semesterInfoName" style="text-align: center;"></h2>
+
+			<form name="semesterInfoForm" id="semesterInfoForm"
+				action="processForm.php" method="post" data-transition="pop">
+
+				<div data-role="fieldcontain">
+					<label for="semesterName">Semester Name:</label> <input type="text"
+						name="semesterName" id="semesterName">
+				</div>
+
+				<div data-role="fieldcontain">
+					<label for="semesterSession">Semeter Session:</label> <select
+						name="semesterSession" id="semesterSession"
+						data-native-menu="false">
+						<option value="">Select...</option>
+
+					</select>
+				</div>
+
+				<div data-role="fieldcontain">
+					<label for="schoolName">School Name:</label> <input type="text"
+						name="schoolName" id="schoolName">
+				</div>
+
+
+
+				<input type="button" name="updateSemester" id="updateSemester"
+					value="Update Semester">
+
+			</form>
+					
+					
+				</div>
+			</div>
+			
+			<!-- q&a master pages -->
+			<div data-role="page" id="editQAMasterPage">
+				<div data-role="header" data-position="fixed" data-theme="a">			
+				</div>
+				<div data-role="content">
+
+			<form name="semesterInfoForm" id="semesterInfoForm"
+				action="processForm.php" method="post" data-transition="pop">
+
+				<div data-role="fieldcontain">
+					<label for="qaMasterName">Q&A Name:</label> <input type="text"
+						name="qaMasterName" id="qaMasterName">
+				</div>
+
+				<input type="button" name="updateQAMaster" id="updateQAMaster"
+					value="Update">
+					
+				<input type="button" name="cancelQAMaster" id="cancelQAMaster"
+					value="Cancel">	
+
+			</form>
+					
+					
+				</div>
+			</div>
+			
+			<!-- q&a master pages -->
+			<div data-role="page" id="qaMasterPage">
+				<div data-role="header" data-position="fixed" data-theme="a">			
+				</div>
+				<div data-role="content">
+					<h3>QA</h3>
+					<br><br>
+					<div id="qaDetailsListDiv" >
+						<ul id="qaDetailsList" data-role="listview" data-inset="true" data-theme="d" data-divider-theme="a">
+						</ul>
+					</div>
+					
+					<input type="button" name="cancelQAMasterPage" id="cancelQAMasterPage" value="Cancel">
+				</div>
+			</div>
+			
+			<div data-role="page" id="qaEntry">
+				<div data-role="header" data-position="fixed" data-theme="a">			
+				</div>
+				<div data-role="content">
+
+					<div data-role="fieldcontain">
+							<label for="question">Question:</label> 
+							<input type="text" name="question" id="question">
+					</div>
+			
+					<div data-role="fieldcontain">
+							<label for="answer">Answer:</label> 
+							<input type="text" name="answer" id="answer">
+					</div>
+					
+					<input type="button" name="updateQA" id="updateQA"
+						value="Update">
+			
+					<input type="button" name="cancelQAButton" id="cancelQAButton"
+						value="Cancel">		
+			
+				</div>
+			</div>
+			
+			
+				
+			<!-- class pages -->
+			<div data-role="page" id="editClassPage">
+				<input type="hidden" id="classEntryClassId">
+				<div data-role="header" data-position="fixed" data-theme="a">			
+					<h1 >Class Edit</h1>
+				</div>
+				<div data-role="content">
+				
+			<div data-role="fieldcontain">
+					<label for="className">Class Name:</label> 
+					<input type="text" name="className" id="className">
+			</div>
+			
+			<div data-role="fieldcontain">
+					<label for="classNumber">Class Number:</label> 
+					<input type="text" name="classNumber" id="classNumber">
+			</div>
+			
+			<div data-role="fieldcontain">	
+			<fieldset data-role="controlgroup"  data-type="horizontal">
+				<legend>Credits:</legend>
+     				<input type="radio" name="credits" id="credits1" value="1" />
+     				<label for="credits1">1</label>
+
+			     	<input type="radio" name="credits" id="credits2" value="2"  />
+     				<label for="credits2">2</label>
+
+			     	<input type="radio" name="credits" id="credits3" value="3"  />
+     				<label for="credits3">3</label>
+
+     				<input type="radio" name="credits" id="credits4" value="4"  />
+     				<label for="credits4">4</label>
+				</fieldset>
+				
+				
+			
+			</div>				
+				<div data-role="fieldcontain">
+		    <fieldset data-role="controlgroup" data-type="horizontal">
+		    	<legend>Class meets on:</legend>
+		    	<input type="checkbox" name="day-sundayCB" id="day-sundayCB" class="custom" />
+				<label for="day-sundayCB">Sunday</label>
+				
+				<input type="checkbox" name="day-mondayCB" id="day-mondayCB" class="custom" />
+				<label for="day-mondayCB">Monday</label>
+
+				<input type="checkbox" name="day-tuesdayCB" id="day-tuesdayCB" class="custom" />
+				<label for="day-tuesdayCB"><em>Tuesday</em></label>
+
+				<input type="checkbox" name="day-wednesdayCB" id="day-wednesdayCB" class="custom" />
+				<label for="day-wednesdayCB">Wednesday</label>    
+				
+				<input type="checkbox" name="day-thursdayCB" id="day-thursdayCB" class="custom" />
+				<label for="day-thursdayCB">Thursday</label>
+				
+				<input type="checkbox" name="day-fridayCB" id="day-fridayCB" class="custom" />
+				<label for="day-fridayCB">Friday</label>        
+				
+				<input type="checkbox" name="day-saturdayCB" id="day-saturdayCB" class="custom" />
+				<label for="day-saturdayCB">Saturday</label>     
+				
+			 </fieldset>
+				
+				<div data-role="fieldcontain">
+					<label for="classTime">Class time of day:</label> 
+					<input type="text" name="classTime" id="classTime">
+				</div>   
+				
+				<div data-role="fieldcontain">
+					<label for="building">Building:</label> 
+					<input type="text" name="building" id="building">
+				</div>   
+				
+				<div data-role="fieldcontain">
+					<label for="room">Room:</label> 
+					<input type="text" name="room" id="room">
+				</div>   
+				
+				<div data-role="fieldcontain">
+					<label for="teacher">Teacher:</label> 
+					<input type="text" name="teacher" id="teacher">
+				</div>   
+				
+				<div data-role="fieldcontain">
+					<label for="teacherEmail">Teacher Email:</label> 
+					<input type="text" name="teacherEmail" id="teacherEmail">
+				</div>   
+				
+				<div data-role="fieldcontain">
+					<label for="teacherPhone">Teacher Phone:</label> 
+					<input type="text" name="teacherPhone" id="teacherPhone">
+				</div>   
+				
+					
+					<input type="button" name="updateClass" id="updateClass" value="Update">
+					<input type="button" name="cancelUpdateClass" id="cancelUpdateClass" value="Cancel">
+					
+				</div>
+			</div>
+			
+			<!-- setup pages -->
+			<div data-role="page" id="setup">
+				<div data-role="header" data-position="fixed" data-theme="a">			
+					<h1>Setup</h1>
+				</div>
+				<div data-role="content">
+					
+					<h3>Setup</h3>
+					<p>Create a normal JQM page and add the trigger element <code>data-wrapper="true"</code> to the page. This will fire the plugin when the page loads. 
+					If your app has several independent JQM pages (no multipage), make sure to include the plugin script, css plus the modified JQM file on every page!</p>
+					
+					<p>The page above will be your <code>wrapper-page</code>. Header and Footer in this page will your global header/footer.</p>
+					
+					<p>Any popover panels you want to add will go after the content section of this page. If you want to create a multipage or splitscreen page, remove
+					the content section and just put panels inside the wrapper. See the demos for details</p>
+					
+					<h3>Panel</h3>
+					<p>Panels need to be <code>div</code> tags. To specify a panel you need to add the following attributes:</p> 
+
+						<ul class="blank">
+							<li><code>data-role="panel"</code> - indicating this is a panel</li>
+							<li><code>data-id="your_panel_name"</code> - a unique name to differentiate panels</li>
+							<li><code>data-panel="type"</code> - can bei either <code>popover, menu, main, fullwidth</code></li>
+							<li><code>data-hash="history/crumbs"</code> (optional) - whether the panel should have an active history alongside JQM and browser</li>
+							<li><code>data-autoshow="once"</code> (optional) - whether to show the panel the first time this page is loaded to the DOM</li>
+						</ul>						
+					
+					<p>Panels itself can contain any number of nested JQM pages. All headers/footers in these pages will be local (can be fixed, too). Make sure to 
+					include a <code>data-show="first"</code> attribute to the default page for each panel. Otherwise the panel will be black when it's opened or a page loads.</p>
+					
+					<h3>Panel Navigation</h3>
+					<p>The plugin tweaks JQM navigation. The main differences are:</p>
+						<ul class="blank">
+							<li><code>$.mobile.pageContainer</code> - allows page container to be changed to either <code>body</code> or <code>panels</code></li>
+							<li><code>data-target="panel-id"</code> - needs to be attached to every panel-link. Omitting this will break the layout as JQM will take over</li>
+							<li><code>pageContainer: $(panel-id)</code> - needs to be included, when calling panel transitions programmatically</li>														
+						</ul>
+					
+					
+				</div>
+			</div>
+			
+			<!-- setup pages -->
+			<div data-role="page" id="xxx">
+				<div data-role="header" data-position="fixed" data-theme="a">			
+					<h1>Setup</h1>
+				</div>
+				<div data-role="content">
+					
+					XXXXXXXXXXXXXXX Page
+					
+					
+					
+				</div>
+			</div>
+			
+			
+							
+							
+	
+
+			
+		</div><!-- end panel -->
+
+		<!-- global footer = inside wrapper, outside panel -->
+		<div data-role="footer" data-id="mainFooter" data-position="fixed">
+			<div data-role="navbar" data-grid="d">
+				<ul>	
+	
+					<li><a href="#starthere" data-target="menu" data-iconpos="top" data-icon="plus">Home</a></li>
+					<li><a href="#useCases" data-target="menu" data-iconpos="top" data-icon="plus">Notes</a></li>
+					<li><a href="#modes" data-target="menu" data-iconpos="top" data-icon="plus">Settings</a></li>
+					<li><a href="#demos" data-target="menu" data-iconpos="top" data-icon="plus">Q&A</a></li>				
+					<li><a href="#features" data-target="menu" data-iconpos="top" data-icon="plus">Exit</a></li>	
+					
+				</ul>
+			</div>
+		</div>	
+
+</div><!-- end wrapper page -->
+				
+				
+</div>
+
+</body>
+
+		
+			
+</html>
+

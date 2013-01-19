@@ -1,0 +1,208 @@
+
+
+body{margin:0; padding:0; width:100%; height:100%; overflow:hidden;}
+.splashImage{
+	position:absolute; z-index:1; width:100%; height:100%; top:0; left:0;
+	background-image2:url('../images/wood1.jpg');
+	background-image:url('../images/chalk2.jpg');
+	 overflow-y: scroll;
+            -webkit-overflow-scrolling: touch;
+	}
+
+.splashImage2
+{
+	background-image2:url('../images/wood1.jpg'); 
+	background-image:url('../images/chalk1.png');
+	background-size:100% 100%;
+}
+
+
+.splashText 
+{ 
+	text-align: center; 
+	font-family: Arial;
+	 font-size: 155%; 
+	  font-weight: bold;
+}
+
+.labelClass 
+{ 
+	color: #B4886B;
+font-weight: bold;
+display: block;
+width: 150px;
+float: left;
+
+
+}
+
+.background 
+{
+    width: 100%; 
+    height: 100%; 
+    position: fixed; 
+    left: 0px; 
+    top: 0px; 
+    z-index2: -1; /* Ensure div tag stays behind content; -999 might work, too. */
+}
+
+.stretch {
+    width:100%;
+    height:100%;
+}
+
+
+
+.splash {
+   align: center;
+}
+
+
+.homepage_body {
+	background-color: #ffffff;
+	background-image: url(../images/paper3.jpg);
+	background-repeat: repeat;
+	background-attachment2: fixed;
+	background-position2: center;
+	background-size: 100%;
+	width:100%;
+  height:100%;
+}
+
+
+#splash_welcome {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	z-index: 999;
+	color: #ffffff;
+	background: #ffffff;
+	padding: 60px;
+	width: 200px;
+	height: 200px;
+	border-radius: 50%;
+	margin: -200px 0 0 -200px;
+	text-align: center;
+	border: inset 44px #C0C0C0;
+	cursor: pointer;
+}
+
+#welcome #wlogo {
+	position: absolute;
+	top: 104px;
+	left: 10px;
+	border: 0px;
+}
+
+
+
+.semesterDiv
+{
+   background-image: url(../images/semester1.jpg);
+   border2: solid red;
+   height: 124px;
+   width: 200px;
+   margin:5px;
+   white-space2: pre-wrap; /* css-3 */
+    white-space2: -moz-pre-wrap; /* Mozilla, since 1999 */
+    white-space2: -pre-wrap; /* Opera 4-6 */   
+    white-space2: -o-pre-wrap; /* Opera 7 */   
+    word-wrap2: break-word; /* Internet Explorer 5.5+ */
+
+}
+
+.semesterText 
+{
+	margin:20%; 
+	padding:20px;
+	font-size: 100%; 
+	 font-weight: bold;
+	text-align2: center;
+}
+
+
+.cleaner{clear: left; line-height: 0; height: 0;}
+.rows{ border2: solid black; width: 100%; min-height: 125px;margin: 45px}
+.rowsAlt{background-color: blue;}
+
+.cols{height: 100%; float: left;}
+.col1{width: 33%;}
+.col2{width: 33%;}
+.col3{width: 33%;}
+
+
+
+.classDiv
+{
+   background-image: url(../images/paper3.jpg);
+   border2: solid red;
+   height: 124px;
+   width: 200px;
+   margin:5px;
+   white-space2: pre-wrap; /* css-3 */
+    white-space2: -moz-pre-wrap; /* Mozilla, since 1999 */
+    white-space2: -pre-wrap; /* Opera 4-6 */   
+    white-space2: -o-pre-wrap; /* Opera 7 */   
+    word-wrap2: break-word; /* Internet Explorer 5.5+ */
+
+}
+
+
+.textareaStyled {
+	width2: 600px;
+	heigh2t: 120px;
+	border: 3px solid #cccccc;
+	padding: 5px;
+	font-family: Tahoma, sans-serif;
+	background-image:url('../images/wood1.jpg');
+	background-position: bottom right;
+	background-repeat: no-repeat;
+}
+
+
+.answerDiv
+{
+   border2: solid red;
+   height: 124px;
+   width: 200px;
+   margin:5px;
+   text-align: center; 
+	font-family: Arial;
+	 font-size: 155%; 
+	  font-weight: bold;
+}
+
+
+.qaContents
+{
+	border: solid blue;
+	background-color: white;
+	text-align: center; 
+	font-family: Arial;
+	font-size: 155%; 
+	 font-weight: bold;
+	
+}
+
+.qaContentsQuestion
+{
+	margin:15px;
+	border: solid black;
+	background-color: white;
+	text-align: center; 
+	font-family: Arial;
+	font-size: 155%; 
+	 font-weight: bold;
+}
+
+.qaContentsAnswer
+{
+	
+	margin:15px;
+	border: solid black;
+	background-color: black;
+	text-align: center; 
+	font-family: Arial;
+	font-size: 155%; 
+	 font-weight: bold;
+}

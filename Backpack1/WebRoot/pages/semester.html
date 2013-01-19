@@ -1,0 +1,1517 @@
+<!doctype html>
+<html>
+<title>Backpack</title>
+<meta charset="utf-8">
+<meta name="viewport"content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet"	href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
+<script type="text/javascript"	src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+<script type="text/javascript"	src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
+<link type="text/css" href="http://dev.jtsage.com/cdn/simpledialog/latest/jquery.mobile.simpledialog.min.css" rel="stylesheet" /> 
+<script type="text/javascript" src="http://dev.jtsage.com/cdn/simpledialog/latest/jquery.mobile.simpledialog.min.js"></script>
+<script type="text/javascript" src="../scripts/db.js"></script>
+
+
+
+<script type="text/javascript" src="../scripts/ckeditor.js"></script>
+<script type="text/javascript" src="../scripts/adapters/jquery.js"></script>
+
+
+
+
+<link rel="stylesheet"	href="./backpack.css" />
+
+<script type="text/javascript" src="http://dev.jtsage.com/jquery.mousewheel.min.js"></script>
+	<script type="text/javascript" src="http://dev.jtsage.com/cdn/datebox/latest/jqm-datebox.core.min.js"></script>
+	<script type="text/javascript" src="http://dev.jtsage.com/cdn/datebox/latest/jqm-datebox.mode.flipbox.min.js"></script>
+	<script type="text/javascript" src="http://dev.jtsage.com/cdn/datebox/i18n/jquery.mobile.datebox.i18n.en_US.utf8.js"></script>
+	
+	<script type="text/javascript" src="../scripts/mobiscroll/js/jquery.mobile.mobiscroll-1.0.js"></script>
+	<script type="text/javascript" src="../scripts/mobiscroll/js/mobiscroll.core-2.1.js"></script>
+	<script type="text/javascript" src="../scripts/mobiscroll/js/mobiscroll.datetime-2.1.js"></script>
+	<script type="text/javascript" src="../scripts/mobiscroll/js/mobiscroll.jqm-2.1.js"></script>
+	<script type="text/javascript" src="../scripts/mobiscroll/js/mobiscroll.select-2.1.js"></script>
+	<script type="text/javascript" src="../scripts/mobiscroll/js/mobiscroll.android-2.1.js"></script>
+	<script type="text/javascript" src="../scripts/mobiscroll/js/mobiscroll.ios-2.1.js"></script>
+	
+	<link rel="stylesheet"	href="../scripts/mobiscroll/css/mobiscroll.core-2.1.css" />
+	<link rel="stylesheet"	href="../scripts/mobiscroll/css/mobiscroll.jqm-2.1.css" />
+	<link rel="stylesheet"	href="../scripts/mobiscroll/css/mobiscroll.animation-2.1.css" />
+	<link rel="stylesheet"	href="../scripts/mobiscroll/css/mobiscroll.android-2.1.css" />
+	<link rel="stylesheet"	href="../scripts/mobiscroll/css/mobiscroll.ios-2.1.css" />
+	
+	
+	<link rel="stylesheet" href="../scripts/backpack.css" />
+	
+	<link rel="stylesheet" href="../scripts/jQuery-TE_v.1.05/jquery-te-Style.css2" />
+	<script type="text/javascript" src="../scripts/jQuery-TE_v.1.05/jquery-te-1.0.5.min.js2"></script>
+	<script type="text/javascript" src="../scripts/JQUERY4U.datetime.js"></script>
+	
+	<link rel="stylesheet" href="../scripts/tinyeditor/style.css" />
+	<script type="text/javascript" src="../scripts/tinyeditor/tinyeditor.js"></script>
+	
+	
+	
+	
+
+<script>
+	var semester;
+	var semesterName;
+	var semesterId;
+	var semsesterSession;
+	var selectedSemester;
+	var selectedClass;
+	var editInit=false;
+	var noteClassId;
+	var noteId;
+	var dbNote;
+	var dbClass;
+	var dbQAMaster;
+	var dbQADetail;
+	var qaQuestions;
+	var currentQuestionIdx=0;
+	var totalQuestions=0;
+	
+	$(document).ready(function() {
+		$('#schoolName').val('');
+		$('.errormsgbox').hide();
+		
+		$("#updateSemester").click(function() {
+			validate();
+		});
+		
+		$("#updateClass").click(function() {
+			validateClass();
+		});
+		
+		$("#addClass").click(function() {
+			addClassPage();
+		});
+		
+		$("#cancelUpdateClass").click(function() {
+			cancelUpdateClass();
+		});
+		
+		$("#classListFooter").click(function() {
+			$.mobile.changePage($('#semesterListPage'));
+			getAllSemesters(getSemestersCallback);
+		});
+		
+		$("#start").click(function() {
+			$.mobile.changePage($('#semesterListPage'));
+			getAllSemesters(getSemestersCallback);
+		});
+		
+		$("#deleteData").click(function() {
+			
+			deleteData();
+		});
+		
+		$("#addSemester").click(function() {
+			
+			$.mobile.changePage($('#semesterInfo'));;
+		});
+		
+		$(function(){
+			// create a datepicker with default settings
+			$("#scroller").scroller({ preset: 'date' });
+		});
+		$(function(){
+			// create a datepicker with default settings
+			$("#classTime").scroller({ preset: 'time' });
+		});
+		$("#notesBtn").click(function() {
+			
+			$.mobile.changePage($('#classPanelPage'), 'pop', false, true); 
+		});
+		$("#notesImg").click(function() {
+			
+			editor();
+		});
+		
+		$("#notesDialogLink").click(function() {
+			
+			$("#theNote").ckeditor();
+			
+		});
+		
+		$("#saveNoteBtn").click(function() {
+			
+			n=$("textarea#theNote").val();
+			alert(dbNote+", note="+n);
+			if(dbNote)
+			{
+				updateDBNotes( dbNote.id, n);
+			}
+			else
+			{
+				id=$("#notesEntryClassId").val();
+				createDBNotes( id, n);
+			}	
+			getClassNotes(dbClass.id);
+			$('#notesEntryDialog').dialog('close');
+				$('#notesList').attr("data-theme", "a");
+		 		$('#notesList'+i).attr("data-role", "content");
+		 		$('#notesList'+i).attr("data-content-theme", "a");
+				//$.mobile.changePage($('#classNotesListPage'));
+		});
+		$("#cancelNoteBtn").click(function() {
+			
+			$.mobile.changePage($('#classNotesListPage'));
+		});
+		$("#cancelNotesList").click(function() {
+			$.mobile.changePage($('#classListPage'));
+		});
+		$("#addNotesBtn").click(function() {
+			alert("add");
+			$("#theNote").ckeditor();
+			//$("#theNote").show("fast");
+			$("#theNote").css("visibility","visible"); 
+			dbNote=null;
+			$("#notesEntryClassId").val(dbClass.id);
+			$("#notesDialogClassname").text(dbClass.className);
+			$("#notesDialogRoom").text(dbClass.room);
+			$.mobile.changePage($('#notesEntryDialog'));
+		});
+		
+		$("#cancelQAMasterList").click(function() {
+			$.mobile.changePage($('#classListPage'));
+		});
+		
+		$("#cancelQA").click(function() {
+			$.mobile.changePage($('#qaMasterListPage'));
+		});
+		
+		$("#cancelQADetailList").click(function() {
+			$.mobile.changePage($('#qaMasterListPage'));
+		});
+		
+		$("#addQADetailBtn").click(function() {
+			addQA(dbQAMaster.id);
+		});
+		
+		$("#answerBtn").click(function() {
+			answerQA();
+		});
+		
+		$("#correctBtn").click(function() {
+			updateCorrectAnswer(qaQuestions.rows.item(currentQuestionIdx).id, qaQuestions.rows.item(currentQuestionIdx).correctCount);
+			nextQA();
+		});
+		$("#incorrectBtn").click(function() {
+			updateIncorrectAnswer(qaQuestions.rows.item(currentQuestionIdx).id, qaQuestions.rows.item(currentQuestionIdx).incorrectCount);
+			nextQA();
+		});
+		
+		// Dialog opened
+		$('#questionPopup').on("pageshow", function() {
+    		//alert("Opened");
+		});
+
+		// Dialog closed
+		$('#questionPopup').on("pagehide", function() {
+    		//alert("Closed");
+		});
+		
+		
+		
+		$("#updateQA").click(function() {
+			if(dbQADetail)
+			{
+				updateDBQaDetail( dbQADetail.qaId, $("#question").val(), $("#answer").val());
+			}
+			else
+			{
+				id=dbQAMaster.id;
+				createQADetail( id, $("#question").val(), $("#answer").val());
+			}	
+			
+			$.mobile.changePage($('#qaMasterListPage'));
+			
+		});
+		
+		
+		
+		
+		
+		if(typeof(Storage)!=="undefined")
+  		{
+  			//alert("Yes! localStorage and sessionStorage support!");
+		 }
+		else
+  		{
+  		//alert("Sorry! No web storage support..");
+  		}
+  		
+  		$(document).delegate('#addQAMasterBtn', 'click', function() {
+		  	$(this).simpledialog({
+    			'mode' : 'string',
+    			'prompt' : 'Enter new QA Name:',
+    			'buttons' : {
+      				'OK': {
+        				click: function () {
+        					addQAMaster();
+          					//$('#dialogoutput').text($('#dialoglink').attr('data-string'));
+        				}
+      				},
+      				'Cancel': {
+        				click: function () { },
+        				icon: "delete",
+        				theme: "c"
+      				}
+    			}
+  			});
+		});
+  		
+  
+  		
+
+
+		
+		
+
+		selectValues = {
+			"" : "Select...",
+			"1" : "Spring",
+			"2" : "Summer",
+			"3" : "Fall/Winter"
+		};
+		var $subType = $("#semesterSession");
+		populate($subType, selectValues);
+
+		//bind validation
+		$('#semesterInfoForm').bind('submit', function(event) {
+			$('[name=semesterName]').each(function() {
+				if (!$(this).val().length) {
+					event.preventDefault();
+					//$(this).css('border', '2px solid red');
+					//alert("Semester name must be entered.")
+
+				}
+			});
+		});
+
+		//var db=openDB();
+		//processDB(db);
+		var db = initDB();
+		createTBackpackTables(db);
+		createClassesTable(db);
+		createNotesTable(db);
+		createQAMasterTable(db);
+		createQADetailTable(db);
+		
+		$("#theNote").ckeditor();
+		
+		if(localStorage.semesterId)
+		{
+			semesterSelect(localStorage.semesterId);
+		}
+		else
+		{
+			//alert("go to home page");
+			$.mobile.changePage($('#homePage'));
+		}	
+
+	});
+	
+	function semesterSelect(id)
+	{
+		//alert("semesterSelect="+id);
+		getSemesterById(id, getSemesterCallback);
+		localStorage.semesterId=id;
+		
+		localStorage.removeItem("semesterId");
+		//window.location.href = "#semesterListPage";
+		//$('#semesterInfo').scrollView();
+		//$.mobile.changePage($('#semesterInfo'));
+	}
+	
+	function getSemesterCallback(transaction, results)
+	{
+		
+		var len = results.rows.length, i;
+		if(len == 1) {
+			selectedSemester=results.rows.item(0);
+			$('#classEntryName').text(selectedSemester.sname);
+			//$.mobile.changePage($('#classListPage'));
+			getAllClassesForSemester(selectedSemester, moveToClassList) ;
+		}
+		
+	}
+
+	function getSemestersCallback(transaction, results) {
+	
+		var len = results.rows.length, i;
+		//alert("getSemestersCallback() len=" + len);
+		$("#semesterList").html('');
+		for (i = 0; i < len; i++) {
+			//<li><a href="acura.html">Acura</a></li>
+			var sid =  results.rows.item(i).id;
+			var s = 'javascript:semesterSelect(\''+sid+'\')';
+			//alert(s);
+			var liStr='<li><a href="'+s+'">' + results.rows.item(i).sname + '</a></li>';
+		 	$('#semesterList').append(liStr);
+		 	//$('#semesterList').attr('href','http://example.com');
+    		//$("#semesterList li[id='" + i + "']").find(".ui-li-maintext").html("<i>" +  results.rows.item(i).sname + "</i>");
+			//alert(results.rows.item(i).sname);
+		}
+		$('#semesterList').attr("data-theme", "a");
+		$('#semesterList').listview('refresh');
+	}
+
+	function processDB(db) {
+		createTables(db);
+	}
+	function moveToAddSemester() {
+		document.location.href = "#semesterInfo";
+	}
+
+	function validate() {
+		if (!$("#semesterName").val().length) {
+			alert("Semester Name required.");
+			//$(".errormsgbox").fadeIn(2000);
+			$('#semesterName').focus();
+			return;
+		}
+		//localStorage.setItem("bill", "rosenberg");
+		//alert(localStorage.getItem("bill"));
+
+		//does semester exist?
+		semester = $("#semesterName").val();
+		getSemester($("#semesterName").val(), createSemesterCallback);
+
+		
+	}
+
+	function createSemesterCallback(transaction, results) {
+
+		//alert("createSemesterCallback()");
+		//alert("Results=" + results);
+		var len = results.rows.length;
+		//alert("getSemester() len=" + len);
+		for (i = 0; i < len; i++) {
+			alert(results.rows.item(i).sname);
+		}
+		if (len == 0) {
+			createSemester($("#semesterName").val(), $("#semesterSession")
+					.val());
+		}
+		
+		$.mobile.changePage($('#semesterListPage'));
+		getAllSemesters(getSemestersCallback);
+
+	}
+
+	function populate(select, data) {
+		select.empty();
+		$.each(data, function(id, option) {
+			select.append($('<option></option>').val(id).html(option));
+		});
+	}
+	function populateDropdown(select, data) {
+		select.html('');
+
+		$.each(data, function(id, option) {
+			alert(option);
+			select.append($('<option></option>').val(id).html(option));
+		});
+	}
+	
+	function createClass()
+	{
+		var myClass = new ClassObject();
+		myClass.building=$("#building").val();
+		myClass.classNm=$("#className").val();
+		myClass.classNumber=$("#classNumber").val();
+		myClass.credits=$("#credits").val();
+		myClass.days=$("#className").val();
+		myClass.room=$("#room").val();
+		myClass.semesterId=selectedSemester.id;
+		myClass.teacher=$("#teacher").val();
+		myClass.teacherEmail=$("#teacherEmail").val();
+		myClass.teacherPhone=$("#teacherPhone").val();
+		myClass.time=$("#classTime").val();
+		createDBClass(myClass);
+		 
+	}
+	
+	function validateClass()
+	{
+		//var sList = "";
+		//$('input[type=checkbox]').each(function () {
+    		//sList += "(" + $(this).val() + "-" + (this.checked ? "checked" : "not checked") + ")";
+		//});
+		//alert(sList);
+		var daylist = "";
+		var dayArray = [];
+		idx=0;
+		if($('#day-sundayCB').attr('checked')) 
+		{
+    		dayArray[idx]="Sunday";
+    		idx++;
+		} 
+		if($('#day-mondayCB').attr('checked')) 
+		{
+    		dayArray[idx]="Monday";
+    		idx++;
+		} 
+		if($('#day-tuesdayCB').attr('checked')) 
+		{
+    		dayArray[idx]="Tuesday";
+    		idx++;
+		} 
+		if($('#day-wednesdayCB').attr('checked')) 
+		{
+    		dayArray[idx]="Wednesday";
+    		idx++;
+		} 
+		if($('#day-thursdayCB').attr('checked')) 
+		{
+    		dayArray[idx]="Thursday";
+    		idx++;
+		} 
+		if($('#day-fridayCB').attr('checked')) 
+		{
+    		dayArray[idx]="Friday";
+    		idx++;
+		} 
+		if($('#day-saturdayCB').attr('checked')) 
+		{
+    		dayArray[idx]="Saturday";
+    		idx++;
+		} 
+		if (!$("#className").val().length) {
+			alert("Class Name required.");
+			$("#className").focus();
+			return;
+		}
+		
+		
+		var myClass = new ClassObject();
+		myClass.building=$("#building").val();
+		myClass.classNm=$("#className").val();
+		myClass.classNumber=$("#classNumber").val();
+		myClass.credits=$('input[name=credits]:checked').val();
+		myClass.days=dayArray;
+		myClass.room=$("#room").val();
+		myClass.semesterId=selectedSemester.id;
+		myClass.teacher=$("#teacher").val();
+		myClass.teacherEmail=$("#teacherEmail").val();
+		myClass.teacherPhone=$("#teacherPhone").val();
+		myClass.time=$("#classTime").val();
+		myClass.id=$("#classEntryClassId").val();
+		//alert("Class id for add/update="+$("#classEntryClassId").val());
+		if($("#classEntryClassId").val() == "-1")
+		{
+			createDBClass(myClass);
+		}
+		else
+		{
+			updateDBClass(myClass);
+		}
+		
+		getAllClassesForSemester(selectedSemester, moveToClassList) ;
+	}
+	
+	
+	function moveToClassList(transaction, results) {
+		var len = results.rows.length, i;
+		//$('#classList').empty();
+		$("#classList").html('');
+		$("#classListDiv").html('');
+		spanstr=" <span  style=\"float:right; background: blue; color: white;\">Content</span> ";
+		img='<div style="float:right; padding-left: 50%;border-style:solid; border-width:2px; width:50%"><img src="../images/edit-icon.png"  width="36" height="36"><img src="../images/notes.jpg"  width="36" height="36"></div>';
+		link='<a href="http://www.pageresource.com"><img src="../images/edit-icon.png" />xxxxxxx</a>';
+		
+		for (i = 0; i < len; i++) {
+			var sid =  results.rows.item(i).id;
+			var s = 'javascript:classSelect(\''+sid+'\')';
+			classNotesClick='onClick="getClassNotes('+results.rows.item(i).id+');"';
+			qaClick=' onClick="getQAMasterList('+results.rows.item(i).id+');" ';
+			qaLink='<img src="../images/qna_icon.jpg"  width="36" height="36"'+qaClick+'>';
+			classInfo=results.rows.item(i).className+" "+results.rows.item(i).room+" "+results.rows.item(i).timeOfClass;
+			classNameLinkOrig='<a href="'+s+'">' + results.rows.item(i).className +'<br>'+results.rows.item(i).room+'</a>';
+			classNameLink='<a data-role="button" data-theme="b" href="'+s+'">' +classInfo+'</a>';
+			
+			classNameLink3='<a href="index.html" data-role="button" data-inline="true" data-theme="b">Save</a>';
+			img='<div style="float:right;border-style:solid; border-width:0px; width:50%"><img src="../images/edit-icon.png"  width="36" height="36"><img '+classNotesClick+' src="../images/notes.jpg"  width="36" height="36">'+qaLink+'</div>';
+			var liStr='<li><div style="height:44px; width:100%"><div style="float:left;border-style:solid; border-width:0px; width:44%">'+classNameLink+'</div>'+img+'</div></li>';
+		 	$('#classList').append(liStr).trigger('create');
+		 	//alert(liStr);
+		}
+		//(className, semesterId, credits, days, timeOfClass, building, room, teacher, teacherEmail, teacherPhone) 
+				
+		$('#classList').attr("data-theme", "a");
+		$.mobile.changePage($('#classListPage'));
+		getSemesterById(selectedSemester.id, updateClassListWithSemeter);
+	}
+	function getClassNotes(id)
+	{
+		var x;
+		getDBClass2(id, function(transaction, results){
+ 			x=results.rows.item(0).className;
+ 			dbClass=results.rows.item(0);
+			noteClassId=id;
+			$("#notesListClassname").text(results.rows.item(0).className);
+			$("#notesListRoom").text(results.rows.item(0).room);
+			getAllNotesForClass(id, function(transaction2, theClassNotes){
+				var len = theClassNotes.rows.length, i;
+ 				//alert("notes length="+len);
+				noteClassId=id;
+				$("#notesList").html('');
+				$("#notesListDiv").html('');
+				for (i = 0; i < len; i++) 
+				{
+					var sid =  theClassNotes.rows.item(i).id;
+					var s = 'javascript:notesSelect(\''+sid+'\')';
+					stringNote=theClassNotes.rows.item(i).notes.substring(0, 20);
+					classNotesClick='onClick="getClassNotes('+theClassNotes.rows.item(i).id+');"';
+					img='<div style="float:right;border-style:solid; border-width:0px; width:50%"><img src="../images/edit-icon.png"  width="36" height="36"><img '+classNotesClick+' src="../images/notes.jpg"  width="36" height="36"></div>';
+					var liStr='<li><div style="height:44px; width:100%"><div style="float:left;border-style:solid; border-width:0px; width:44%"><a href="'+s+'">' + stringNote +'<br>'+theClassNotes.rows.item(i).id+'</a></div>'+img+'</div></li>';
+		 			$('#notesList').append(liStr).trigger('create');
+		 			//alert(liStr);
+				}
+				$('#notesList').attr("data-theme", "a");
+		 		$('#notesList'+i).attr("data-role", "content");
+		 		$('#notesList'+i).attr("data-content-theme", "a");
+				$.mobile.changePage($('#classNotesListPage'));
+			});
+			
+			
+		});
+		
+		
+	}
+	
+	function getQAMaster(classId)
+	{
+	
+		
+		getDBClass2(classId, function(transaction, theClass){
+				var len = theClass.rows.length, i;
+				dbClass=theClass.rows.item(0);
+				$("#notesDialogClassname").text(theClass.className);
+				$("#notesDialogRoom").text(theClass.room);
+				$.mobile.changePage($('#qaMasterListPage'));	
+			});
+		
+	
+	}
+	
+	function getQAMasterList(classId)
+	{
+		var x;
+		getDBClass2(classId, function(transaction, results){
+ 			x=results.rows.item(0).className;
+ 			dbClass=results.rows.item(0);
+			qaClassId=classId;
+			$("#qaMasterListClassname").text(results.rows.item(0).className);
+			$("#qaMasterListRoom").text(results.rows.item(0).room);
+			getAllQAMastersForClass(classId, function(transaction2, theClassQAs){
+				var len = theClassQAs.rows.length, i;
+				noteClassId=classId;
+				$("#qaMasterList").html('');
+				$("#qaMasterListDiv").html('');
+				for (i = 0; i < len; i++) 
+				{
+					var sid =  theClassQAs.rows.item(i).id;
+					var s = 'javascript:qaMasterSelect(\''+sid+'\')';
+					stringNote=theClassQAs.rows.item(i).name;
+					qaClick='onClick="getQADetailList('+theClassQAs.rows.item(i).id+');"';
+					executeClick='onClick="executeQA('+sid+');"';
+					img='<div style="float:right;border-style:solid; border-width:0px; width:50%"><img src="../images/edit-icon.png"  width="36" height="36"><img '+qaClick+' src="../images/notes.jpg"  width="36" height="36"><img '+executeClick+' src="../images/execute.gif"  width="36" height="36"></div>';
+					var liStr='<li><div style="height:44px; width:100%"><div style="float:left;border-style:solid; border-width:0px; width:44%"><a href="'+s+'">' + stringNote +'<br>'+theClassQAs.rows.item(i).id+'</a></div>'+img+'</div></li>';
+		 			$('#qaMasterList').append(liStr).trigger('create');
+		 			//alert(liStr);
+				}
+				$('#qaMasterList').attr("data-theme", "a");
+		 		$('#qaMasterList'+i).attr("data-role", "content");
+		 		$('#qaMasterList'+i).attr("data-content-theme", "a");
+				$.mobile.changePage($('#qaMasterListPage'));
+			});
+			
+			
+		});
+		
+		
+	}
+	
+	function executeQA(masterId)
+	{
+	
+		//alert("executeQA="+masterId);
+		//$.mobile.changePage($('#popup'));
+		//$("#popup").dialog();
+		totalQuestions=0;
+		getQADetailByMasterId(masterId, function(transaction, theDetails){
+				qaQuestions = theDetails;
+				$("#qaDetailListDiv").html('');
+				$("#qaDetailList").html('');
+				
+				currentQuestionIdx=0;
+				totalQuestions = theDetails.rows.length;
+				$("#questionPopupQuestionText").html( qaQuestions.rows.item(currentQuestionIdx).question);
+				$("#answerPopupQuestionText").html( qaQuestions.rows.item(currentQuestionIdx).question);
+				$("#questionPopupAnswerText").html( qaQuestions.rows.item(currentQuestionIdx).answer);
+				$("#answerPopupAnswerText").html( qaQuestions.rows.item(currentQuestionIdx).answer);
+		
+				$("#questionDialog").click();
+				
+		});
+		
+		
+	
+	}
+	
+	function answerQA()
+	{
+		
+	
+		$("#questionPopup" ).dialog( "close" );
+		setTimeout("$('#answerDialog').click()", 20);
+		//$("#answerDialog").click();
+		
+		//alert("answerQA");
+		
+	
+	
+	}
+	
+	function nextQA()
+	{
+	
+		//alert("nextQA");
+		
+		if(currentQuestionIdx < totalQuestions-1)
+		{
+			//$("#answerPopup" ).dialog( "close" );
+			currentQuestionIdx++;
+			$("#questionPopupQuestionText").html( qaQuestions.rows.item(currentQuestionIdx).question);
+			$("#answerPopupQuestionText").html( qaQuestions.rows.item(currentQuestionIdx).question);
+			$("#questionPopupAnswerText").html( qaQuestions.rows.item(currentQuestionIdx).answer);
+			$("#answerPopupAnswerText").html( qaQuestions.rows.item(currentQuestionIdx).answer);
+			$("#questionDialog").click();
+		}
+		else
+		{
+			$("#answerPopup" ).dialog( "close" );
+		}
+		
+		//$("#questionPopup" ).dialog( "close" );
+		//setTimeout("$('#answerDialog').click()", 20);
+		//$("#answerDialog").click();
+		
+	
+	
+	}
+	
+	function getQADetailList(masterId)
+	{
+		var x;
+		getQAMasterById(masterId, function(transaction, results){
+ 			x=results.rows.item(0).name;
+ 			dbQAMaster=results.rows.item(0);
+			qaMasterId=masterId;
+			$("#qaDetailListClassname").text(dbClass.className);
+			$("#qaDetailListQAMasterName").text(results.rows.item(0).name);
+			
+			
+			getQADetailByMasterId(masterId, function(transaction2, theDetails){
+				var len = theDetails.rows.length, i;
+				$("#qaDetailListDiv").html('');
+				$("#qaDetailList").html('');
+				for (i = 0; i < len; i++)  
+				{
+					var sid =  theDetails.rows.item(i).id;
+					var s = 'javascript:qaDetailSelect(\''+sid+'\')';
+					question=theDetails.rows.item(i).question;
+					answer=theDetails.rows.item(i).answer;
+					qaClick='onClick="updateQA('+theDetails.rows.item(i).id+');"';
+					executeClick='onClick="executeQA('+theDetails.rows.item(i).id+');"';
+					img='<div style="float:right;border-style:solid; border-width:0px; width:50%"><img '+qaClick+' src="../images/edit-icon.png"  width="36" height="36"><img '+qaClick+' src="../images/execute.gif"  width="36" height="36"></div>';
+					var liStr='<li><div style="height:44px; width:100%"><div style="float:left;border-style:solid; border-width:0px; width:44%"><a href="'+s+'">' + question +'<br>'+theDetails.rows.item(i).id+'</a></div>'+img+'</div></li>';
+		 			$('#qaDetailList').append(liStr).trigger('create');
+		 			//alert(liStr);
+				}
+				$('#qaDetailList').attr("data-theme", "a");
+		 		$('#qaDetailList'+i).attr("data-role", "content");
+		 		$('#qaDetailList'+i).attr("data-content-theme", "a");
+				$.mobile.changePage($('#qaDetailListPage'));
+			});
+			
+			
+		});
+		
+		
+	}
+	
+	function addQA(qaId)
+	{
+	
+		$("#question").val(''); 
+		$("#answer").val('');
+		getQAMasterById(qaId, function(transaction, theQa){
+				var len = theQa.rows.length, i;
+				alert("len ="+len);
+				dbQAMaster=theQa.rows.item(0);
+				$("#qaEntryClassName").text(dbClass.className);
+				$("#qaEntryMasterName").text(theQa.rows.item(0).name);
+				$.mobile.changePage($('#qaEntry'));
+			});
+	}
+	
+	function updateQA(qaDetailId)
+	{
+	
+		$("#question").val(''); 
+		$("#answer").val('');
+		getQADetailById(qaDetailId, function(transaction, theQa){
+				var len = theQa.rows.length, i;
+				alert("updateQA len ="+len);
+				dbQADetail=theQa.rows.item(0);
+				$("#qaEntryClassName").text(dbClass.className);
+				$("#qaEntryMasterName").text(dbQAMaster.name);
+				$("#question").val(dbQADetail.question);
+				$("#answer").val(dbQADetail.answer);
+				$.mobile.changePage($('#qaEntry'));
+			});
+	}
+	
+	function addQAMaster()
+	{
+		alert($('#addQAMasterBtn').attr('data-string'));
+		qaMasterName=$('#addQAMasterBtn').attr('data-string');
+		getQAMasterByName(dbClass.id, qaMasterName, function(transaction, qqq){
+				var len = qqq.rows.length, i;
+				alert("xxx len="+len);
+				if (len == 0)
+				{
+					createQAMaster(dbClass.id, qaMasterName) ;
+					$.mobile.changePage($('#qaMasterListPage'));
+				}
+				else
+				{
+					
+					alert("QA already exists. Please choose another.");
+				}	
+			});
+		
+	}
+	
+	function notesSelect(noteId)
+	{
+		$("#theNote").ckeditor();
+		$("#theNote").css("visibility","visible"); 
+		$("#notesDialogClassname").text(dbClass.className);
+		$("#notesDialogRoom").text(dbClass.room);
+		getDBNote(noteId, function(transaction, classNote){
+				var len = classNote.rows.length, i;
+				dbNote=classNote.rows.item(0);
+				alert(dbNote.notes);
+				$("#theNote").html('');
+ 				$("#theNote").html(dbNote.notes);
+				$.mobile.changePage($('#notesEntryDialog'));
+			});
+	
+	}
+	
+	function gotoClassNotesPage(transaction, results)
+	{
+		//alert("gotoNotesEntryDialog");
+		alert(results.rows.item(0).className);
+		$("#notesListClassname").text(results.rows.item(0).className);
+	
+		$.mobile.changePage($('#classNotesListPage'));
+	}
+	
+	function gotoAddClassNotes(id)
+	{
+		//alert("classNotes="+id);
+		noteClassId=id;
+		//$("#theNote").jqte();
+		$("#notesEntryClassId").val(id);
+		getDBClass(id, gotoNotesEntryDialog);
+		
+	}
+	function gotoNotesEntryDialog(transaction, results)
+	{
+		//alert("gotoNotesEntryDialog");
+		alert(results.rows.item(0).className);
+		$("#notesDialogClassname").text(results.rows.item(0).className);
+	
+		$.mobile.changePage($('#notesEntryDialog'));
+	}
+	function updateClassListWithSemeter(transaction, results)
+	{
+		var len = results.rows.length, i;
+		$("#classListPageSemester").text(results.rows.item(0).sname);
+		$('#classList').listview('refresh');
+	}
+	
+	function classSelect(classId)
+	{
+		getDBClass(classId, classSelectCallback);
+	}
+	
+	function classSelectCallback(transaction, results)
+	{
+	
+		//alert("classSelectCallback() timeOfclass="+results.rows.item(0).timeOfClass);
+		var len = results.rows.length, i;
+		selectedClass=results.rows.item(0);
+		$("#classEntryClassId").val(results.rows.item(0).id);
+		$("#building").val(results.rows.item(0).building);
+		$("#className").val(results.rows.item(0).className);
+		$("#classNumber").val(results.rows.item(0).classNumber);
+		
+		$('input:radio[name=credits]')[0].checked = false;
+		$('input:radio[name=credits]')[1].checked = false;
+		$('input:radio[name=credits]')[2].checked = false;
+		$('input:radio[name=credits]')[3].checked = false;
+		
+		var c=results.rows.item(0).credits - 1;
+		
+		$('input:radio[name=credits]')[c].checked = true;
+		
+		$("#room").val(results.rows.item(0).room);
+		$("#teacher").val(results.rows.item(0).teacher);
+		$("#teacherEmail").val(results.rows.item(0).teacherEmail);
+		$("#teacherPhone").val(results.rows.item(0).teacherPhone);
+		
+		
+		$("#classTime").val(results.rows.item(0).timeOfClass);
+		
+		$('#day-sundayCB').attr('checked', false);
+		$('#day-mondayCB').attr('checked', false);
+		$('#day-tuesdayCB').attr('checked', false);
+		$('#day-wednesdayCB').attr('checked', false);
+		$('#day-thursdayCB').attr('checked', false);
+		$('#day-fridayCB').attr('checked', false);
+		$('#day-satdayCB').attr('checked', false);
+		
+		var daysArray = new Array();
+		daysArray = results.rows.item(0).days.split(",");
+	
+		for (day in daysArray ) 
+		{
+			if(daysArray[day] == "Sunday")
+			{
+				$('#day-sundayCB').attr('checked', true);
+			}
+			if(daysArray[day] == "Monday")
+			{
+				$('#day-mondayCB').attr('checked', true);
+			}
+			if(daysArray[day] == "Tuesday")
+			{
+				$('#day-tuesdayCB').attr('checked', true);
+			}
+			if(daysArray[day] == "Wednesday")
+			{
+				$('#day-wednesdayCB').attr('checked', true);
+			}
+			if(daysArray[day] == "Thursday")
+			{
+				$('#day-thursdayCB').attr('checked', true);
+			}
+			if(daysArray[day] == "Friday")
+			{
+				$('#day-fridayCB').attr('checked', true);
+			}
+			if(daysArray[day] == "Saturday")
+			{
+				$('#day-satdayCB').attr('checked', true);
+			}
+		}
+		
+		$.mobile.changePage($('#classEntry'));
+	
+	}
+	
+	function addClassPage(id)
+	{
+		//alert("add class");
+		$("#classEntryClassId").val("-1");
+		$("#building").val("");
+		$("#className").val("");
+		$("#classNumber").val("");
+		$("#credits").val("");
+		$("#room").val("");
+		$("#teacher").val("");
+		$("#teacherEmail").val("");
+		$("#teacherPhone").val("");
+		$("#classTime").val("");
+		$.mobile.changePage($('#classEntry'));
+	}
+	
+	function cancelUpdateClass()
+	{
+		//alert("cancelUpdateClass="+selectedSemester.id);
+		semesterSelect(selectedSemester.id);
+	}
+	function notesEntry()
+	{
+		$("#theNote").ckeditor();
+		$.mobile.changePage($('#notesEntryDialog'));
+	
+	}
+	function editor2() {
+		alert("editor");
+		$.mobile.changePage($('#foo'));
+		if(editInit == false)
+		{
+		editInit=true;
+		new TINY.editor.edit('editor', {
+			id : 'theNote',
+			width : 584,
+			height : 175,
+			cssclass : 'te',
+			controlclass : 'tecontrol',
+			rowclass : 'teheader',
+			dividerclass : 'tedivider',
+			controls : [ 'bold', 'italic', 'underline', 'strikethrough', '|',
+					'subscript', 'superscript', '|', 'orderedlist',
+					'unorderedlist', '|', 'outdent', 'indent', '|',
+					'leftalign', 'centeralign', 'rightalign', 'blockjustify',
+					'|', 'unformat', '|', 'undo', 'redo', 'n', 'font', 'size',
+					'style', '|', 'image', 'hr', 'link', 'unlink', '|', 'cut',
+					'copy', 'paste' ],
+			footer : true,
+			fonts : [ 'Verdana', 'Arial', 'Georgia', 'Trebuchet MS' ],
+			xhtml : true,
+			cssfile : 'style.css',
+			bodyid : 'editor',
+			footerclass : 'tefooter',
+			toggle : {
+				text : 'source',
+				activetext : 'wysiwyg',
+				cssclass : 'toggle'
+			},
+			resize : {
+				cssclass : 'resize'
+			}
+		});
+		}
+	}
+</script>
+</head>
+<body>
+
+	<div data-role="page" id="homePage">
+
+		<div data-role="header">
+			<h1>Backpack</h1>
+		</div>
+
+		<div data-role="content">
+
+			<div style="text-align: center;">
+				<h2>Welcome</h2>
+				<img src="../images/Backpack.jpg" width="200" alt="Logo">
+			</div>
+			
+			</Br>
+			
+			
+		<input type="button" name="start" id="start"
+					value="Start">
+					
+		<a href="#" id="simplestring" data-role="button">Open Dialog</a>
+			<strong>HTML</strong><pre class="prettyprint">
+			You have entered: <span id="dialogoutput"></span>		
+					
+		<input type="button" name="deleteData" id="deleteData"
+					value="Delete Data">			
+					
+		<input id="scroller" name="scroller" />
+	
+		
+		</div>
+
+
+
+	</div>
+	
+	<div data-role="page" id="semesterListPage">
+
+		<div data-role="header">
+			<h1>Backpack</h1>
+		</div>
+
+		<div data-role="content">
+
+			<div style="text-align: center;">
+				<h2>Existing Semesters</h2>
+				<img src="../images/Backpack.jpg" width="200" alt="Logo">
+			</div>
+			
+			</Br>
+			
+			<ul id="semesterList" data-role="listview" >
+				
+			</ul>
+
+		
+		</div>
+		
+			<input type="button" name="addSemester" id="addSemester"
+					value="Add Semester">	
+
+
+
+	</div>
+	
+
+
+	<div data-role="footer" data-position="fixed" data-id="nav">
+		<div data-role="navbar">
+			
+		</div>
+	</div>
+
+	<div data-role="page" id="semesterInfo">
+
+		<div data-role="content">
+
+			<h2 id="semesterInfoName" style="text-align: center;"></h2>
+
+			<form name="semesterInfoForm" id="semesterInfoForm"
+				action="processForm.php" method="post" data-transition="pop">
+
+				<div data-role="fieldcontain">
+					<label for="semesterName">Semester Name:</label> <input type="text"
+						name="semesterName" id="semesterName">
+				</div>
+
+				<div data-role="fieldcontain">
+					<label for="semesterSession">Semeter Session:</label> <select
+						name="semesterSession" id="semesterSession"
+						data-native-menu="false">
+						<option value="">Select...</option>
+
+					</select>
+				</div>
+
+				<div data-role="fieldcontain">
+					<label for="schoolName">School Name:</label> <input type="text"
+						name="schoolName" id="schoolName">
+				</div>
+
+
+
+				<input type="button" name="updateSemester" id="updateSemester"
+					value="Update Semester">
+
+				<div class="errormsgbox">This is a Error message Box</div>
+
+			</form>
+
+		</div>
+
+	</div>
+	
+	<div data-role="page" id="classEntry">
+	<input type="hidden" id="classEntryClassId">
+		<div data-role="header">
+			<h1>Semester Class List</h1>
+			<h1 id="classEntryName"></h1>
+		</div>
+
+		<div data-role="content">
+
+			<form name="semesterInfoForm" id="semesterInfoForm"
+				action="#" method="post" data-transition="pop">
+				
+			<div data-role="fieldcontain">
+					<label for="className">Class Name:</label> 
+					<input type="text" name="className" id="className">
+			</div>
+			
+			<div data-role="fieldcontain">
+					<label for="classNumber">Class Number:</label> 
+					<input type="text" name="classNumber" id="classNumber">
+			</div>
+			
+			<div data-role="fieldcontain">	
+			<fieldset data-role="controlgroup"  data-type="horizontal">
+				<legend>Credits:</legend>
+     				<input type="radio" name="credits" id="credits1" value="1" />
+     				<label for="credits1">1</label>
+
+			     	<input type="radio" name="credits" id="credits2" value="2"  />
+     				<label for="credits2">2</label>
+
+			     	<input type="radio" name="credits" id="credits3" value="3"  />
+     				<label for="credits3">3</label>
+
+     				<input type="radio" name="credits" id="credits4" value="4"  />
+     				<label for="credits4">4</label>
+				</fieldset>
+				
+				
+			
+			</div>				
+				<div data-role="fieldcontain">
+		    <fieldset data-role="controlgroup" data-type="horizontal">
+		    	<legend>Class meets on:</legend>
+		    	<input type="checkbox" name="day-sundayCB" id="day-sundayCB" class="custom" />
+				<label for="day-sundayCB">Sunday</label>
+				
+				<input type="checkbox" name="day-mondayCB" id="day-mondayCB" class="custom" />
+				<label for="day-mondayCB">Monday</label>
+
+				<input type="checkbox" name="day-tuesdayCB" id="day-tuesdayCB" class="custom" />
+				<label for="day-tuesdayCB"><em>Tuesday</em></label>
+
+				<input type="checkbox" name="day-wednesdayCB" id="day-wednesdayCB" class="custom" />
+				<label for="day-wednesdayCB">Wednesday</label>    
+				
+				<input type="checkbox" name="day-thursdayCB" id="day-thursdayCB" class="custom" />
+				<label for="day-thursdayCB">Thursday</label>
+				
+				<input type="checkbox" name="day-fridayCB" id="day-fridayCB" class="custom" />
+				<label for="day-fridayCB">Friday</label>        
+				
+				<input type="checkbox" name="day-saturdayCB" id="day-saturdayCB" class="custom" />
+				<label for="day-saturdayCB">Saturday</label>     
+				
+			 </fieldset>
+				
+				<div data-role="fieldcontain">
+					<label for="classTime">Class time of day:</label> 
+					<input type="text" name="classTime" id="classTime">
+				</div>   
+				
+				<div data-role="fieldcontain">
+					<label for="building">Building:</label> 
+					<input type="text" name="building" id="building">
+				</div>   
+				
+				<div data-role="fieldcontain">
+					<label for="room">Room:</label> 
+					<input type="text" name="room" id="room">
+				</div>   
+				
+				<div data-role="fieldcontain">
+					<label for="teacher">Teacher:</label> 
+					<input type="text" name="teacher" id="teacher">
+				</div>   
+				
+				<div data-role="fieldcontain">
+					<label for="teacherEmail">Teacher Email:</label> 
+					<input type="text" name="teacherEmail" id="teacherEmail">
+				</div>   
+				
+				<div data-role="fieldcontain">
+					<label for="teacherPhone">Teacher Phone:</label> 
+					<input type="text" name="teacherPhone" id="teacherPhone">
+				</div>   
+				
+					
+		  
+		</div>
+
+				
+			<input type="button" name="updateClass" id="updateClass"
+					value="Update Class">
+			
+			<input type="button" name="cancelUpdateClass" id="cancelUpdateClass"
+					value="Cancel">					
+
+			</form>
+
+		</div>
+		
+		 <div data-role="footer" data-position="fixed" data-id="nav">
+		      <div data-role="navbar">
+        		<ul>
+          			<li><a href="#home" class="ui-btn-active ui-state-persist">The Footer Page</a></li>
+         
+		        </ul>
+      		</div>
+    	</div>
+
+	</div>
+	
+	<div data-role="page" id="classListPage">
+
+		<div data-role="header">
+			<h1>Backpack - Class List</h1>
+			<h1 id="classListPageSemester"></h1>
+		</div>
+
+		<div data-role="content">
+
+			<div style="text-align: center;">
+				<h2>Classes</h2>
+			</div>
+					
+			<div id="classListDiv">
+			
+			</div>
+			
+			<ul id="classList" data-role="listview" >
+				
+			</ul>
+			
+			<br>
+			<input type="button" name="addClass" id="addClass"
+					value="Add Class">
+
+		
+		</div>
+		
+		<div data-role="footer" data-position="fixed" data-id="classListFooter" id="classListFooter">
+		      <div data-role="navbar">
+        		<ul>
+          			<li><a href="#" class="ui-btn-active ui-state-persist">Semesters</a></li>
+         
+		        </ul>
+      		</div>
+    	</div>
+
+
+
+	</div>
+	
+	<div data-role="page" id="classPanelPage">
+
+		<div data-role="header">
+			<h1>Backpack</h1>
+		</div>
+
+		<div data-role="content">
+
+			<div style="text-align: center;">
+				<h2>Welcome</h2>
+				<img src="../images/Backpack.jpg" width="200" alt="Logo">
+			</div>
+			
+			</Br>
+			
+			
+		<img id="notesImg" src="../images/notes.jpg" width="200" alt="Logo">
+		<a href="javascript:editor();" id="notesDialogLink" opendata-role="button" data-inline="true" data-rel="dialog" data-transition="pop">Open dialog</a>  
+		
+		
+		</div>
+
+
+
+	</div>
+	
+	
+	<div data-role="page" id="notesEntryDialog" >
+    	<div data-role="header">
+			<h1>Backpack - Notes</h1>
+			<h1 id="notesDialogClassname"></h1>
+			<h1 id="notesDialogRoom"></h1>
+		</div>
+    	<input type="hidden" id="notesEntryClassId">
+    	<textarea id="theNote" name="theNote" rows="4" cols="50"></textarea>
+
+    	<a href="#" id="saveNoteBtn" data-role="button" data-rel="back">Save note</a>
+    	<input type="button" name="cancelNoteBtn" id="cancelNoteBtn" value="Cancel">
+	</div>
+	
+	<div data-role="page" id="classNotesListPage" >
+    	<div data-role="header">
+			<h1>Backpack - Notes</h1>
+			<h1 id="notesListClassname"></h1>
+			<h1 id="notesListRoom"></h1>
+		</div>
+    	<input type="hidden" id="notesListClassId">
+    	<div data-role="content">
+
+			<div style="text-align: center;">
+				<h2>Notes</h2>
+			</div>
+					
+			<div id="notesListDiv">
+			
+			</div>
+			
+			<ul id="notesList" data-role="listview" >
+				
+			</ul>
+			
+			<br>
+			<input type="button" name="addNotesBtn" id="addNotesBtn"
+					value="New">
+					<br>
+			<input type="button" name="cancelNotesList" id="cancelNotesList"
+					value="Cancel">
+
+		
+		</div>
+    	
+	</div>
+	
+	<div data-role="page" id="qaMasterListPage" >
+    	<div data-role="header">
+			<h1>Backpack - Q&A</h1>
+			<h1 id="qaMasterListClassname"></h1>
+			<h1 id="qaMasterListRoom"></h1>
+		</div>
+    	<input type="hidden" id="qaMasterListClassId">
+    	<a id='questionDialog' href="#questionPopup" data-rel="dialog" data-transition="pop" style='display:none;'></a>
+    	<a id='answerDialog' href="#answerPopup" data-rel="dialog" data-transition="pop" style='display:none;'></a>
+    	<div data-role="content">
+
+			<div style="text-align: center;">
+				<h2>Q&A</h2>
+			</div>
+					
+			<div id="qaMasterListDiv">
+			
+			</div>
+			
+			<ul id="qaMasterList" data-role="listview" >
+				
+			</ul>
+			
+			<br>
+			<input type="button" name="addQAMasterBtn" id="addQAMasterBtn"
+					value="New">
+					<br>
+			<input type="button" name="cancelQAMasterList" id="cancelQAMasterList"
+					value="Cancel">
+
+		
+		</div>
+    	
+	</div>
+	
+	<div data-role="page" id="qaEntry">
+	<input type="hidden" id="qaMasterId">
+		<div data-role="header">
+			<h1>Question and Answer</h1>
+			<h1 id="qaEntryClassName"></h1>
+			<h1 id="qaEntryMasterName"></h1>
+		</div>
+
+		<div data-role="content">
+
+			<form name="qaForm" id="qaForm"
+				action="#" method="post" data-transition="pop">
+
+			<div data-role="fieldcontain">
+					<label for="question">Question:</label> 
+					<input type="text" name="question" id="question">
+			</div>
+			
+			<div data-role="fieldcontain">
+					<label for="answer">Answer:</label> 
+					<input type="text" name="answer" id="answer">
+			</div>
+			
+		</form>
+		  
+				
+			<input type="button" name="updateQA" id="updateQA"
+					value="Update">
+			
+			<input type="button" name="cancelQA" id="cancelQA"
+					value="Cancel">					
+
+			
+
+		</div>
+		
+		 <div data-role="footer" data-position="fixed" data-id="nav">
+		      <div data-role="navbar">
+        		<ul>
+          			<li><a href="#home" class="ui-btn-active ui-state-persist">The Footer Page</a></li>
+         
+		        </ul>
+      		</div>
+    	</div>
+
+	</div>
+	
+	<div data-role="page" id="qaDetailListPage" >
+    	<div data-role="header">
+			<h1>Backpack - QA List</h1>
+			<h1 id="qaDetailListClassname"></h1>
+			<h1 id="qaDetailListQAMasterName"></h1>
+		</div>
+    	<input type="hidden" id="notesListClassId">
+    	<div data-role="content">
+
+			<div style="text-align: center;">
+				<h2>Q and A</h2>
+			</div>
+					
+			<div id="qaDetailListDiv">
+			
+			</div>
+			
+			<ul id="qaDetailList" data-role="listview" >
+				
+			</ul>
+			
+			<br>
+			<input type="button" name="addQADetailBtn" id="addQADetailBtn"
+					value="New">
+					<br>
+			<input type="button" name="cancelQADetailList" id="cancelQADetailList"
+					value="Cancel">
+
+		
+		</div>
+    	
+	</div>
+	
+	<div data-role="page" id="questionPopup"  name="questionPopup">
+		<input type="hidden" id="currentQADetailId">
+
+		<div data-role="header" data-theme="e">
+			<h1>Dialog</h1>
+		</div><!-- /header -->
+
+		<div data-role="content" data-theme="d">	
+			<h2>Question </h2><h2 id="questionNum"></h2>
+			<h2 id="questionPopupQuestionText"></h2>	
+			
+					
+			<input type="button" name="answerBtn" id="answerBtn"
+					value="Answer">
+			
+		</div><!-- /content -->
+	
+		<div data-role="footer">
+			<h4>Page Footer</h4>
+		</div><!-- /footer -->
+	</div><!-- /page popup -->
+	
+	<div data-role="page" id="answerPopup">
+		<input type="hidden" id="currentQADetailId">
+
+		<div data-role="header" data-theme="e">
+			<h1>Dialog</h1>
+		</div><!-- /header -->
+
+		<div data-role="content" data-theme="d">	
+			<h2>Question </h2><h2 id="questionNum"></h2>
+			<h2 id="answerPopupQuestionText"></h2>
+			<br>	
+			<h2>Answer: </h2>
+			<h2 id="answerPopupAnswerText"></h2>	
+			
+			<input type="button" name="correctBtn" id="correctBtn"
+					value="Correct?">
+			<input type="button" name="incorrectBtn" id="incorrectBtn" value="Incorrect?">
+			
+		</div><!-- /content -->
+	
+		<div data-role="footer">
+			<h4>Page Footer</h4>
+		</div><!-- /footer -->
+	</div><!-- /page popup -->
+	
+	
+	
+	
+
+</body>
+</html>

@@ -1,0 +1,277 @@
+<html>
+<head>
+<title>Hairy Hippo</title>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
+<link rel="stylesheet"
+	href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
+<script type="text/javascript"
+	src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+<script type="text/javascript"
+	src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
+<script type="text/javascript" src="../scripts/db.js"></script>
+
+<script>
+	var semester;
+
+	$(document).ready(function() {
+		$('#schoolName').val('');
+		$('.errormsgbox').hide();
+
+		$("#updateSemester").click(function() {
+			validate();
+		});
+
+		selectValues = {
+			"" : "Select...",
+			"1" : "Spring",
+			"2" : "Summer",
+			"3" : "Fall/Winter"
+		};
+		var $subType = $("#semesterSession");
+		populate($subType, selectValues);
+
+		//bind validation
+		$('#semesterInfoForm').bind('submit', function(event) {
+			$('[name=semesterName]').each(function() {
+				if (!$(this).val().length) {
+					event.preventDefault();
+					//$(this).css('border', '2px solid red');
+					//alert("Semester name must be entered.")
+
+				}
+			});
+		});
+
+		//var db=openDB();
+		//processDB(db);
+		var db = initDB();
+		createTBackpackTables(db);
+		getAllSemesters(getSemestersCallback);
+
+	});
+
+	function getSemestersCallback(transaction, results) {
+		var len = results.rows.length, i;
+		//	$('#semesterList').empty();
+		//alert("semester len=" + len);
+		for (i = 0; i < len; i++) {
+		 //	$('#semesterList').append('<ul>' + results.rows.item(i).sname + '</ul>');
+			//alert(results.rows.item(i).sname);
+		}
+	}
+
+	function processDB(db) {
+		createTables(db);
+	}
+	function moveToAddSemester() {
+		document.location.href = "#semesterInfo";
+	}
+
+	function validate() {
+		if (!$("#semesterName").val().length) {
+			alert("Semester Name required.");
+			//$(".errormsgbox").fadeIn(2000);
+			$('#semesterName').focus();
+			return;
+		}
+		//localStorage.setItem("bill", "rosenberg");
+		//alert(localStorage.getItem("bill"));
+
+		//does semester exist?
+		semester = $("#semesterName").val();
+		getSemester($("#semesterName").val(), createSemesterCallback);
+
+		getAllSemesters();
+		document.location.href = "#home";
+	}
+
+	function createSemesterCallback(transaction, results) {
+
+		alert("createSemesterCallback()");
+		alert("Results=" + results);
+		var len = results.rows.length;
+		alert("getSemester() len=" + len);
+		for (i = 0; i < len; i++) {
+			alert(results.rows.item(i).sname);
+		}
+		if (len == 0) {
+			createSemester($("#semesterName").val(), $("#semesterSession")
+					.val());
+		}
+
+	}
+
+	function populate(select, data) {
+		select.empty();
+		$.each(data, function(id, option) {
+			select.append($('<option></option>').val(id).html(option));
+		});
+	}
+	function populateDropdown(select, data) {
+		select.html('');
+
+		$.each(data, function(id, option) {
+			alert(option);
+			select.append($('<option></option>').val(id).html(option));
+		});
+	}
+</script>
+</head>
+<body>
+
+	<div data-role="page" id="home">
+
+		<div data-role="header">
+			<h1>Backpack</h1>
+		</div>
+
+		<div data-role="content">
+
+			<div style="text-align: center;">
+				<h2>Existing Semesters</h2>
+				<img src="images/logo.png" width="200" alt="Logo">
+			</div>
+
+			<ul  id="semesterList" data-role="listview">
+				<li><a href="#" onClick="moveToAddSemester()">Add Semester</a>
+				</li>
+				<li>Spring 2013
+					<ul >
+
+						<li><img src="../images/products/thumbs/moon-globe-lamp.jpg"
+							alt="Moon Globe Lamp">
+							<h2>English</h2>
+							<p>Mr. Potter</p>
+						</li>
+
+						<li><img src="../images/products/thumbs/glowing-santa.jpg"
+							alt="Glowing Santa of Cheer">
+							<h2>Calculus</h2>
+							<p>Ms. Blacula</p>
+						</li>
+
+						<li><img src="../images/products/thumbs/fairy-lights.jpg"
+							alt="Fabulous Fairy Lights">
+							<h2>Business Administration</h2>
+							<p>Mr. Garcia</p>
+						</li>
+						<li><img src="../images/products/thumbs/fairy-lights.jpg"
+							alt="Fabulous Fairy Lights">
+							<h2>Add a Class</h2>
+						</li>
+
+					</ul>
+				</li>
+				<li>Summer 2013
+					<ul>
+
+						<li><img src="../images/products/thumbs/moon-globe-lamp.jpg"
+							alt="Moon Globe Lamp">
+							<h2>English</h2>
+							<p>Creates a beautiful, relaxing light.</p>
+						</li>
+
+						<li><img src="images/products/thumbs/glowing-santa.jpg"
+							alt="Glowing Santa of Cheer">
+							<h2>Calculus</h2>
+							<p>Ho ho ho!</p>
+						</li>
+
+						<li><img src="images/products/thumbs/fairy-lights.jpg"
+							alt="Fabulous Fairy Lights">
+							<h2>Business Administration</h2>
+							<p>Add a magical touch to any home.</p>
+						</li>
+
+					</ul>
+				</li>
+				<li>Fall 2013
+					<ul>
+
+						<li><img src="../images/products/thumbs/moon-globe-lamp.jpg"
+							alt="Moon Globe Lamp">
+							<h2>English</h2>
+							<p>Creates a beautiful, relaxing light.</p>
+						</li>
+
+						<li><img src="images/products/thumbs/glowing-santa.jpg"
+							alt="Glowing Santa of Cheer">
+							<h2>Calculus</h2>
+							<p>Ho ho ho!</p>
+						</li>
+
+						<li><img src="images/products/thumbs/fairy-lights.jpg"
+							alt="Fabulous Fairy Lights">
+							<h2>Business Administration</h2>
+							<p>Add a magical touch to any home.</p>
+						</li>
+
+					</ul>
+				</li>
+			</ul>
+		</div>
+
+
+
+	</div>
+
+
+	<div data-role="footer" data-position="fixed" data-id="nav">
+		<div data-role="navbar">
+			<ul>
+				<li><a href="#home">Home</a></li>
+				<li><a href="#contact" class="ui-btn-active ui-state-persist">Contact
+						Us</a></li>
+			</ul>
+		</div>
+	</div>
+
+	<div data-role="page" id="semesterInfo">
+
+		<div data-role="header">
+			<h1>Contact Us</h1>
+		</div>
+
+		<div data-role="content">
+
+			<h2 style="text-align: center;">Semester Info</h2>
+
+			<form name="semesterInfoForm" id="semesterInfoForm"
+				action="processForm.php" method="post" data-transition="pop">
+
+				<div data-role="fieldcontain">
+					<label for="semesterName">Semester Name:</label> <input type="text"
+						name="semesterName" id="semesterName">
+				</div>
+
+				<div data-role="fieldcontain">
+					<label for="semesterSession">Semeter Session:</label> <select
+						name="semesterSession" id="semesterSession"
+						data-native-menu="false">
+						<option value="">Select...</option>
+
+					</select>
+				</div>
+
+				<div data-role="fieldcontain">
+					<label for="schoolName">School Name:</label> <input type="text"
+						name="schoolName" id="schoolName">
+				</div>
+
+
+
+				<input type="button" name="updateSemester" id="updateSemester"
+					value="Update Semester">
+
+				<div class="errormsgbox">This is a Error message Box</div>
+
+			</form>
+
+		</div>
+
+	</div>
+
+</body>
+</html>

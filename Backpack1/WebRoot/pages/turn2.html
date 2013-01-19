@@ -1,0 +1,428 @@
+<!doctype html>
+<html>
+<head>
+<title>turn.js - The page flip effect for HTML5</title>
+<meta name="viewport" content="width = 1000" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+
+<link rel="stylesheet" type="text/css" href="../scripts/turn/turn.css">
+<!-- <link rel="stylesheet" type="text/css" href="http://www.turnjs.com/css/styles.css"> -->
+
+<script type="text/javascript"	src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+<script type="text/javascript" src="../scripts/turn/turn.js"></script>
+
+</head>
+<body>
+<div id="viewport">
+<header>
+	<nav>
+		<a href="#home" class="on">Home</a>
+		<a href="#usage">Usage</a>
+		<a href="#get">Get turn.js</a>
+		<a href="#reference">Reference</a>
+
+		<a href="#credits">About</a>
+	</nav>
+</header>
+
+
+<div id="controllers" style="display:none;">
+	<div class="pages shadows" id="magazine">
+		
+		<!-- Home -->
+		
+		<div>
+			<p>Front Page  -- The awesome paper-like effect made for HTML5</p>
+<p><a href="http://www.turnjs.com/#home">www.turnjs.com</a></p>
+
+		</div>
+		
+		<!-- Usage -->
+
+		<div> 
+
+			<div class="page-content">
+				<h1>turn.js</h1>
+				<!-- <div style="clear:both"></div> -->
+				<p class="definition">is a plugin for jQuery that adds a beautiful transition similar to real pages in a book or magazine for HTML5.</p>
+			</div>
+
+		</div>
+
+		<!-- Quick Reference -->
+
+		<div> 
+			<div class="page-content">
+
+			<h2>Getting Started</h2>
+
+			<p>Here's an example:</p>
+
+			
+<pre>
+this is style
+</pre>
+			
+
+<pre>
+This is sample
+</pre>
+
+
+<pre>
+this is script
+</pre>
+
+			<p>That's it!</p>
+			</div>
+
+		</div>
+
+		<!-- Get turn.js 1 -->
+
+		<div> 
+			<h1>Get turn.js</h1>
+
+		</div>
+		
+		<!-- Get turn.js 2 -->
+
+		<div> 
+			<div class="page-content">
+
+<pre>
+$ git clone git://github.com/blasten/turn.js.git
+</pre>
+
+
+			</div>
+		 </div>
+		
+
+		<!-- Reference 1 -->
+
+		<div>
+			<h1>Quick Reference</h1>
+		</div>
+
+		<!-- Reference 2 -->
+		<div id="ref">
+			<div>
+			<div class="page-content">
+				<h3>Constructor</h3>
+				<div>
+				<p> Creates an instance of turn.</p>
+			        </div>
+				
+
+				<div>
+					<p>Scheme used for calling methods or getting properties</p>
+				</div>
+				
+
+				<h3>Properties</h3>
+
+
+
+
+				</div>
+			</div>
+		</div>
+
+		<!--   -->
+
+		<div> 
+			<div class="page-content">
+				<b>Hello Everyone,</b> <br />
+
+				I'm Emmanuel Garcia.
+				
+			
+				<h2> turn.js </h2>
+
+				<h2> Contact </h2>
+
+		
+			</div>
+
+		</div>
+	</div>
+
+	<div id="next"> <i></i> </div>
+	<div id="previous"> <i></i> </div>
+
+	<div id="shadow-page"></div>
+</div>
+
+
+
+
+<footer>
+ <a href="http://www.twitter.com/blasten" target="_blank">@blasten</a>
+</footer>
+
+</div>
+
+
+
+<script type="text/javascript">
+
+	window.pages = ['home', 'usage', 'usage', 'get', 'get', 'reference', 'reference', 'credits'];
+
+
+	function getURL() {
+		
+		return window.location.href.split('#').shift();
+
+	}
+
+	function getHash() {
+		
+		return window.location.hash.slice(1);
+
+	}
+
+	function setControllPos() {
+
+		var view = $('#magazine').turn('view');
+
+		if (view[0]) $('#previous').addClass('visible');
+		else $('#previous').removeClass('visible');
+
+		if (view[1]) $('#next').addClass('visible');
+		else $('#next').removeClass('visible');
+
+	}
+
+	function checkHash(hash) {
+
+		var hash = getHash(), k;
+
+		if ((k=jQuery.inArray(hash, pages))!=-1) {
+			$('nav').children().each(function(index, value) { 
+				$(value).attr('class', ($(value).attr('href').indexOf(hash)!=-1) ? 'on' : '');
+			});
+			return k+1;
+		}
+		
+		return 1;
+	}
+
+
+	function rotated() {
+		
+		return Math.abs(window.orientation)==90;
+	
+	}
+
+	function isPhone() {
+		
+		return navigator.userAgent.match(/iPhone/i);
+
+	}
+
+	function resizeViewport() {
+
+		$('#viewport').css({width: $(window).width(), height: (isPhone() && !rotated()) ? 1670 :  $(document).height()});
+
+	}
+
+	function setScroll() {
+
+		if (isPhone())
+			window.scrollTo(0, (rotated()) ? $('#magazine').offset().top-6 : 1);
+
+	}
+
+	function moveMagazine(page) {
+
+	var that = $('#magazine'),
+			rendered = that.data().done,
+			width = that.width(),
+			pageWidth = width/2,
+/*
+			options = {duration: (!rendered) ? 0 : 600, easing: 'easeInOutCubic', complete: function(){ $('#magazine').turn('resize'); }};
+*/
+			options = {duration: (!rendered) ? 0 : 600, complete: function(){ $('#magazine').turn('resize'); }};
+
+
+			$('#controllers').stop();
+
+			if ((page==1 || page == that.data().totalPages) && !rotated()) {
+
+				var leftc = ($(window).width()-width)/2,
+					leftr = ($(window).width()-pageWidth)/2, 
+					leftd = (page==1)? leftr - leftc - pageWidth : leftr - leftc;
+
+				$('#controllers').animate({left: leftd}, options);
+
+			} else
+				$('#controllers').animate({left: 0}, options);
+	}
+
+
+	$(document).ready(function() {
+	
+		/* Turn events */
+		$('#magazine').
+			bind('turning', function(e, page){
+
+				//Let's do something amazing here
+
+				moveMagazine(page);
+			
+
+			}).
+			bind('turned', function(e, page, pageObj) {
+
+
+				var rendered = $(this).data().done;
+
+				if (!rendered) {
+					moveMagazine(page);
+					$('#controllers').fadeIn();
+				} else {
+					jQuery.each(pages, function(index, value) {
+						if (page==index+1) {
+							var newUrl = getURL() + '#' + value;
+							window.location.href = newUrl;
+							return false;
+						}
+					});
+				}
+
+				setControllPos();
+			
+				if (page==1) $('#shadow-page').fadeIn('slow');
+				else  $('#shadow-page').fadeOut((rendered) ? 'slow' : 0);
+
+
+
+		 }).bind('start', function(e, page) {
+
+			if (page==2)
+				$('#previous').hide();
+			else if (page==$(this).data().totalPages-1)
+				$('#next').hide();
+
+		}).bind('end', function(e, page) {
+
+			if (page==2) 
+				$('#previous').show();
+			else if (page==$(this).data().totalPages-1)
+				$('#next').show();
+
+		});
+
+
+		/* Window events */
+		$(window).bind('keydown', function(e){
+			
+			if (e.keyCode==37) 
+				$('#magazine').turn('previous');
+			else if (e.keyCode==39)
+				$('#magazine').turn('next');
+
+		}).bind('hashchange', function() {
+
+			var page = checkHash();
+			$('#magazine').turn('page', page);
+
+		}).bind('touchstart', function(e) {
+
+			var t = e.originalEvent.touches;
+			if (t[0]) touchStart = {x: t[0].pageX, y: t[0].pageY};
+
+			touchEnd = null;
+
+		}).bind('touchmove', function(e) {
+
+			var t = e.originalEvent.touches, pos = $('#magazine').offset();
+
+			if (t[0].pageX>pos.left && t[0].pageY>pos.top && t[0].pageX<pos.left+$('#magazine').width() && t[0].pageY<pos.top+$('#magazine').height()) {
+				
+				if (t.length==1)
+				e.preventDefault();
+			
+				if (t[0]) touchEnd = {x: t[0].pageX, y: t[0].pageY};
+
+			}
+
+		}).bind('touchend', function(e) {
+
+			if (window.touchStart && window.touchEnd) {
+				var that = $('#magazine'),
+					w = that.width()/2,
+					d = {x: touchEnd.x-touchStart.x, y: touchEnd.y-touchStart.y},
+					pos = {x: touchStart.x-that.offset().left, y: touchStart.y-that.offset().top};
+			
+				if (Math.abs(d.y)<100)
+				 if (d.x>100 && pos.x<w)
+				 	$('#magazine').turn('previous');
+				 else if (d.x<100 && pos.x>w)
+				 	$('#magazine').turn('next');
+
+			}
+		}).resize(function() {
+ 			
+ 			$('#magazine').turn('resize');
+
+ 			resizeViewport();
+
+		});
+
+
+		$('#next').click(function(e) {
+
+			$('#magazine').turn('next');
+			return false;
+
+		});
+
+		$('#previous').click(function(e) {
+			
+			$('#magazine').turn('previous');
+			return false;
+
+		});
+
+		$('#magazine').children(':first').bind('flip', function() {
+			
+			 $('#shadow-page').fadeOut('slow');
+
+		}).find('p').fadeOut(0).fadeIn(2000);
+
+
+		$('body').bind('orientationchange', function() {
+			
+			resizeViewport();
+
+			setScroll();
+
+			moveMagazine($('#magazine').turn('page'));
+
+		});
+
+		/* Create internal instance */
+		
+		if ($(window).width()<=1200)
+			$('body').addClass('x1024');
+	
+		$('#magazine').turn({page: checkHash(), shadows: true, acceleration: true});
+
+	
+
+		resizeViewport();
+
+		setScroll();
+
+		
+	
+	});
+
+
+</script>
+
+
+</body>
+</html>
